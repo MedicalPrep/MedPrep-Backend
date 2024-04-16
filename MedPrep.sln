@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{09E5C440-F6A5-4AC7-876C-060600EEBCBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedPrep.Api", "src\MedPrep.Api\MedPrep.Api.csproj", "{D8C5355B-1704-4CEA-BDDA-8C7C23B9A0A2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D8C5355B-1704-4CEA-BDDA-8C7C23B9A0A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8C5355B-1704-4CEA-BDDA-8C7C23B9A0A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8C5355B-1704-4CEA-BDDA-8C7C23B9A0A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8C5355B-1704-4CEA-BDDA-8C7C23B9A0A2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D8C5355B-1704-4CEA-BDDA-8C7C23B9A0A2} = {09E5C440-F6A5-4AC7-876C-060600EEBCBF}
+	EndGlobalSection
+EndGlobal
