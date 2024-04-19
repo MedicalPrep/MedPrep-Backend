@@ -1,11 +1,9 @@
 namespace MedPrep.Api.Models;
 
-using System.ComponentModel.DataAnnotations;
+using MedPrep.Api.Models.Common;
 
-public class VideoSource
+public class VideoSource : BaseEntity
 {
-    [Key]
-    public Guid Id { get; set; }
     public string Source { get; set; } = string.Empty;
 
     // References

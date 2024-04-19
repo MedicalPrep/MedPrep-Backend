@@ -1,11 +1,9 @@
 namespace MedPrep.Api.Models;
 
-using System.ComponentModel.DataAnnotations;
+using MedPrep.Api.Models.Common;
 
-public class Video
+public class Video : BaseEntity, ISoftDeletable
 {
-    [Key]
-    public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public ICollection<VideoSource> VideoSources { get; } = new List<VideoSource>();
@@ -15,4 +13,8 @@ public class Video
     // References
     public Guid TeacherId { get; set; }
     public Teacher Teacher { get; set; } = null!;
+
+    // soft deletable
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
 }

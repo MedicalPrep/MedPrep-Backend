@@ -1,8 +1,9 @@
 namespace MedPrep.Api.Models;
 
-public class License
+using MedPrep.Api.Models.Common;
+
+public class License : BaseEntity
 {
-    public Guid Id { get; set; }
     public string Country { get; set; } = string.Empty;
     public string ProvinceOrState { get; set; } = string.Empty;
     public string LicenseNumber { get; set; } = string.Empty;
@@ -13,4 +14,8 @@ public class License
     // References
     public Guid TeacherId { get; set; }
     public Teacher Teacher { get; set; } = null!;
+
+    // soft deletable
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
 }

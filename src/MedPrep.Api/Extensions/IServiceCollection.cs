@@ -16,7 +16,7 @@ public static class IService
 
     public static IServiceCollection AddAppContext(this IServiceCollection services)
     {
-        services.AddDbContext<MedPrepContext>();
+        _ = services.AddDbContext<MedPrepContext>();
         return services;
     }
 }
