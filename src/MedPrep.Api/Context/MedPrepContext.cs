@@ -62,6 +62,23 @@ public class MedPrepContext(
             .HasIndex(license => license.IsDeleted)
             .HasFilter("IsDeleted = 0");
         _ = modelBuilder.Entity<License>().HasQueryFilter(license => license.IsDeleted == false);
+
+        _ = modelBuilder
+            .Entity<VideoSource>()
+            .HasIndex(videoSource => videoSource.IsDeleted)
+            .HasFilter("IsDeleted = 0");
+        _ = modelBuilder
+            .Entity<VideoSource>()
+            .HasQueryFilter(videoSource => videoSource.IsDeleted == false);
+
+        _ = modelBuilder
+            .Entity<SubtitleSource>()
+            .HasIndex(subtitleSource => subtitleSource.IsDeleted)
+            .HasFilter("IsDeleted = 0");
+        _ = modelBuilder
+            .Entity<SubtitleSource>()
+            .HasQueryFilter(subtitleSource => subtitleSource.IsDeleted == false);
+
         base.OnModelCreating(modelBuilder);
     }
 }
