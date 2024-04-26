@@ -25,22 +25,12 @@ namespace MedPrep.Api.Repositories
         public void CreatePlaylist(Playlist playlist)
         {
             _context.Playlists.Add(playlist);
-            _context.SaveChanges();
         }
 
         public void UpdatePlaylist(Playlist playlist)
         {
             _context.Playlists.Update(playlist);
-            _context.SaveChanges();
         }
-        public void Save()
-        {
-            _context.SaveChanges();
-        }
-
-
-
-
 
     }
 }

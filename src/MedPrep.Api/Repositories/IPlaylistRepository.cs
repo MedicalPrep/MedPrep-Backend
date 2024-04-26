@@ -11,8 +11,5 @@ namespace MedPrep.Api.Repositories{
         void CreatePlaylist(Playlist playlist);
         void UpdatePlaylist(Playlist playlist);
 
-
-        void Save();
-
     }
 }

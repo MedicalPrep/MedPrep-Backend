@@ -18,7 +18,5 @@ namespace MedPrep.Api.Repositories
         IEnumerable<CourseModule> GetCourseModulesByTopic(string topic);
         Playlist GetPlaylistForCourseModule(CourseModule module);
         double GetCurrentCourseModulePrice(CourseModule module);
-
-        void Save();
     }
 }

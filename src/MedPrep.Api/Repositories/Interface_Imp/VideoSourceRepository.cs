@@ -18,7 +18,6 @@ namespace MedPrep.Api.Repositories
         public void CreateVideoSource(VideoSource videoSource)
         {
             _context.VideoSources.Add(videoSource);
-            Save();
         }
 
         public VideoSource GetVideoSourceById(Guid videoSourceId)
@@ -37,7 +36,6 @@ namespace MedPrep.Api.Repositories
             if (existingVideoSource != null)
             {
                 _context.Entry(existingVideoSource).CurrentValues.SetValues(videoSource);
-                Save();
             }
         }
 
@@ -45,12 +43,6 @@ namespace MedPrep.Api.Repositories
         public void DeleteVideoSource(VideoSource videoSource)
         {
             _context.VideoSources.Remove(videoSource);
-            Save();
-        }
-
-        public void Save()
-        {
-            _context.SaveChanges();
         }
     }
 }

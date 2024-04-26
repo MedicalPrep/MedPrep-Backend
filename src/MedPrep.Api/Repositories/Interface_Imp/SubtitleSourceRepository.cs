@@ -27,24 +27,19 @@ namespace MedPrep.Api.Repositories
         public void DeleteSubtitileSource(SubtitleSource subtitleSource)
         {
             context.SubtitleSources.Remove(subtitleSource);
-            Save();
+        
         }
 
         public void CreateSubtitleSource(SubtitleSource subtitleSource)
         {
             context.SubtitleSources.Add(subtitleSource);
-            Save();
+
         }
 
         public void RouteToS3(SubtitleSource subtitleSource)
         {
             // Logic to route the subtitle source to S3 storage
             // This method is just a placeholder and would have actual implementation
-        }
-
-        public void Save()
-        {
-            context.SaveChanges();
         }
     }
 }

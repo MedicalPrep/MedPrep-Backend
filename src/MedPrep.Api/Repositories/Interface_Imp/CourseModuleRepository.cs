@@ -21,7 +21,6 @@ namespace MedPrep.Api.Repositories
 
         public void CreateCourseModule(CourseModule module){
             context.CourseModules.Add(module);
-            context.SaveChanges();
         }
 
     public void UpdateCourseModule(CourseModule module)
@@ -40,36 +39,18 @@ namespace MedPrep.Api.Repositories
             // Mark the entity as modified in the context
             context.Entry(existingModule).State = EntityState.Modified;
 
-            // Save changes to the database
-            context.SaveChanges();
+
         }
     }
 
     public Playlist GetPlaylistForCourseModule(CourseModule module)
         {
-            return context.Playlists.FirstOrDefault(p => p.Modules.Contains(module));
+            return module.Playlist
         }
 
     public double GetCurrentCourseModulePrice(CourseModule module)
         {
             return Convert.ToDouble(module.Price);
         }
-
-    public void Save()
-        {
-            context.SaveChanges();
-        }
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }
