@@ -19,7 +19,5 @@ namespace MedPrep.Api.Repositories
         IEnumerable<User> GetUsersPurchasedVideo(string videoId);
         SubtitleSource GetSubtitleSourceForVideo(string videoId);
 
-        void Save();
-
     }
 }

@@ -11,6 +11,5 @@ namespace MedPrep.Api.Repositories
         License GetLicenseById(int licenseId);
         IEnumerable<License> GetAllLicenses();
         void DeleteLicense(int licenseId);
-        void save();
     }
 }

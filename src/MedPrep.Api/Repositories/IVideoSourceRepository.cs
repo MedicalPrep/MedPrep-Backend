@@ -18,8 +18,6 @@ namespace MedPrep.Api.Repositories{
 
         IEnumerable<VideoSource> GetallVideoSources(VideoSource videoSource);
 
-        void Save();
-
 
     }
 }

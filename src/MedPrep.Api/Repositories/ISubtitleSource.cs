@@ -15,6 +15,4 @@ namespace MedPrep.Api.Repositories
         void DeleteSubtitileSource(SubtitleSource subtitleSource);
         void CreateSubtitleSource(SubtitleSource subtitleSource);
         void RouteToS3(SubtitleSource subtitleSource);
-
-        void Save();
 }

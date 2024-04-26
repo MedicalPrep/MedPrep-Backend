@@ -17,7 +17,6 @@ namespace MedPrep.Api.Repositories
         public void UploadLicense(License license)
         {
             context.Licenses.Add(license);
-            context.SaveChanges();
         }
 
         public void UpdateLicense(License license, License newLicense)
@@ -33,7 +32,6 @@ namespace MedPrep.Api.Repositories
                 existingLicense.LicenseSource = newLicense.LicenseSource;
 
                 context.Entry(existingLicense).State = EntityState.Modified;
-                context.SaveChanges();
             }
         }
 
@@ -53,13 +51,9 @@ namespace MedPrep.Api.Repositories
             if (license != null)
             {
                 context.Licenses.Remove(license);
-                context.SaveChanges();
             }
         }
 
-        public void Save()
-        {
-            context.SaveChanges();
-        }
+
     }
 }

@@ -27,13 +27,13 @@ namespace MedPrep.Api.Repositories
         public void CreateVideo(Video video)
         {
             context.Videos.Add(video);
-            Save();
+
         }
 
         public void UpdateVideo(Video video)
         {
             context.Videos.Update(video);
-            Save();
+
         }
 
         public void DeleteVideo(string Name)
@@ -42,7 +42,6 @@ namespace MedPrep.Api.Repositories
             if (video != null)
             {
                 context.Videos.Remove(video);
-                Save();
             }
         }
 
@@ -59,12 +58,6 @@ namespace MedPrep.Api.Repositories
             var video = GetVideoById(videoId);
             return video?.SubtitleSources.FirstOrDefault();
         }
-
-        public void Save()
-        {
-            context.SaveChanges();
-        }
-
     }
 }
 
