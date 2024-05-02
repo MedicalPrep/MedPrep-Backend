@@ -4,16 +4,14 @@ using MedPrep.Api.Models.Common;
 using Microsoft.EntityFrameworkCore;
 
 [Index(nameof(Email), IsUnique = true)]
-public class User : BaseEntity, ISoftDeletable
+public class User : Account, IBaseEntity
 {
-    public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
+    public string Firstname { get; set; } = string.Empty;
+    public string Lastname { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
 
     // References
+    public ICollection<Playlist> PlaylistPurchases { get; set; } = new List<Playlist>();
+    public ICollection<CourseModule> CourseModulePurchases { get; set; } = new List<CourseModule>();
     public ICollection<Video> VideoPurchases { get; } = new List<Video>();
-
-    // soft deletable
-    public bool IsDeleted { get; set; }
-    public DateTime? DeletedAt { get; set; }
 }

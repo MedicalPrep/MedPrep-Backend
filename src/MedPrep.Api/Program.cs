@@ -11,8 +11,14 @@ builder.Services.AddSwaggerGen();
 // App extensions services
 builder.Services.AddAppConfig(builder.Configuration);
 builder.Services.AddAppContext();
+builder.Services.AddIdentityContext();
+builder.Services.AddRepositories();
+builder.Services.AddServices();
+builder.Services.AddExceptionsHandlers();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

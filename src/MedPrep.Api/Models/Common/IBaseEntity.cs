@@ -3,7 +3,7 @@ namespace MedPrep.Api.Models.Common;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public abstract class BaseEntity
+public interface IBaseEntity
 {
     [Key]
     public Guid Id { get; set; }
