@@ -3,7 +3,7 @@ namespace MedPrep.Api.Services;
 using System.Net;
 using System.Net.Mail;
 using MedPrep.Api.Config;
-using MedPrep.Api.Services.Interface;
+using MedPrep.Api.Services.Common;
 using Microsoft.Extensions.Options;
 
 public class EmailService(IOptions<EmailConfig> emailConfig) : IEmailService

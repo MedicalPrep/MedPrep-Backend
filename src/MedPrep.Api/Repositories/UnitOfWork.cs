@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MedPrep.Api.Context;
 using MedPrep.Api.Models.Common;
-using MedPrep.Api.Repositories.Interfaces;
+using MedPrep.Api.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
 
 public class UnitOfWork(MedPrepContext context) : IUnitOfWork, IDisposable

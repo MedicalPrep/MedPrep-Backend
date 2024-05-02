@@ -3,7 +3,7 @@ namespace MedPrep.Api.Repositories;
 using System.Threading.Tasks;
 using MedPrep.Api.Context;
 using MedPrep.Api.Models;
-using MedPrep.Api.Repositories.Interfaces;
+using MedPrep.Api.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
 
 public class TeacherRepository(MedPrepContext context) : ITeacherRepository

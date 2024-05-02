@@ -2,7 +2,7 @@ namespace MedPrep.Api.Repositories;
 
 using MedPrep.Api.Context;
 using MedPrep.Api.Models;
-using MedPrep.Api.Repositories.Interfaces;
+using MedPrep.Api.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
 
 public class UserRepository(MedPrepContext context) : IUserRepository
@@ -36,7 +36,8 @@ public class UserRepository(MedPrepContext context) : IUserRepository
     public Task<bool> CheckUsernameAsync(string username) =>
         this.context.User.AnyAsync(u => u.Username == username);
 
-    public Task<bool> CheckEmailAsync(string email) => this.context.User.AnyAsync(u => u.Email == email);
+    public Task<bool> CheckEmailAsync(string email) =>
+        this.context.User.AnyAsync(u => u.Email == email);
 
     public async Task<User?> SaveAsync(User user)
     {

@@ -1,7 +1,7 @@
-namespace MedPrep.Api.Services;
+namespace MedPrep.Api.Services.Common;
 
 using System.Security.Claims;
-using static MedPrep.Api.Config.JwtServiceContracts;
+using static MedPrep.Api.Services.Contracts.JwtServiceContracts;
 
 public interface IJwtService
 {

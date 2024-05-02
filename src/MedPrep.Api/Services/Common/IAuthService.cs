@@ -1,4 +1,4 @@
-namespace MedPrep.Api.Services.Interface;
+namespace MedPrep.Api.Services.Common;
 
 using static MedPrep.Api.Services.Contracts.AuthServiceContracts;
 

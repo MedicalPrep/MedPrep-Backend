@@ -1,6 +1,4 @@
-namespace MedPrep.Api.Repositories.Interfaces;
-
-using System.Data;
+namespace MedPrep.Api.Repositories.Common;
 
 public interface IUnitOfWork
 {

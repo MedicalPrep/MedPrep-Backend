@@ -1,4 +1,4 @@
-namespace MedPrep.Api.Config;
+namespace MedPrep.Api.Services.Contracts;
 
 public static class JwtServiceContracts
 {

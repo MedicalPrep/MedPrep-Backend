@@ -1,4 +1,4 @@
-namespace MedPrep.Api.Repositories.Interfaces;
+namespace MedPrep.Api.Repositories.Common;
 
 using MedPrep.Api.Models;
 

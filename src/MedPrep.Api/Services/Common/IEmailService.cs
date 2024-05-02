@@ -1,4 +1,4 @@
-namespace MedPrep.Api.Services.Interface;
+namespace MedPrep.Api.Services.Common;
 
 public interface IEmailService
 {
