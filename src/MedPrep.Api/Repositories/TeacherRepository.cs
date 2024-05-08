@@ -51,4 +51,9 @@ public class TeacherRepository(MedPrepContext context) : ITeacherRepository
         }
         return Task.CompletedTask;
     }
+
+    public Task<RefreshToken?> GetRefreshTokenAsync(Guid teacherId, string refreshToken) =>
+        this.context.RefreshToken.FirstOrDefaultAsync(t =>
+            t.AccountId == teacherId && t.Token == refreshToken
+        );
 }

@@ -23,6 +23,7 @@ public class UnitOfWork(MedPrepContext context) : IUnitOfWork, IDisposable
         CancellationToken cancellationToken = default
     )
     {
+        this.AuditEntityIntercept();
         if (!hardDelete)
         {
             this.SoftDeleteIntercept();
@@ -41,6 +42,26 @@ public class UnitOfWork(MedPrepContext context) : IUnitOfWork, IDisposable
             softDeletable.State = EntityState.Modified;
             softDeletable.Entity.IsDeleted = true;
             softDeletable.Entity.DeletedAt = DateTime.UtcNow;
+        }
+    }
+
+    private void AuditEntityIntercept()
+    {
+        var entries = this
+            .context.ChangeTracker.Entries()
+            .Where(e =>
+                e.Entity is IBaseEntity
+                && (e.State == EntityState.Added || e.State == EntityState.Modified)
+            );
+
+        foreach (var entityEntry in entries)
+        {
+            ((IBaseEntity)entityEntry.Entity).UpdatedAt = DateTime.Now;
+
+            if (entityEntry.State == EntityState.Added)
+            {
+                ((IBaseEntity)entityEntry.Entity).CreatedAt = DateTime.Now;
+            }
         }
     }
 

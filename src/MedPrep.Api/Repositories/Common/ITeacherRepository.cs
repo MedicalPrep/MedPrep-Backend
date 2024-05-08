@@ -10,4 +10,5 @@ public interface ITeacherRepository
     Task<bool> CheckEmailAsync(string email);
     Task DeleteAsync(Teacher teacher);
     Task UpdateAsync(Teacher teacher);
+    Task<RefreshToken?> GetRefreshTokenAsync(Guid teacherId, string refreshToken);
 }

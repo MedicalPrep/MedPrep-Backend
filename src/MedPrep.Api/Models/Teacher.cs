@@ -4,9 +4,6 @@ using MedPrep.Api.Models.Common;
 
 public class Teacher : Account
 {
-    public string Firstname { get; set; } = string.Empty;
-    public string Lastname { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
     public VerficationStatus Status { get; set; }
 
     // References

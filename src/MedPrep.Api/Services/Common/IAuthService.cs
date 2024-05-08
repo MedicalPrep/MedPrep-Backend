@@ -6,8 +6,10 @@ public interface IAuthService
 {
     Task<AuthUserResult> LoginUser(LoginQuery query);
     Task<AuthTeacherResult> LoginTeacher(LoginQuery query);
-    Task<AuthUserResult> RefrehsUserToken(RefreshQuery query);
+    Task<AuthUserResult> RefreshUserToken(RefreshQuery query);
     Task<AuthTeacherResult> RefreshTeacherToken(RefreshQuery query);
-    Task RegisterUser(RegisterUserQuery query);
-    Task RegisterTeacher(RegisterTeacherQuery query);
+    Task RegisterUser(RegisterUserCommand query);
+    Task RegisterTeacher(RegisterTeacherCommand query);
+    Task ConfirmUser(ConfirmAccountQuery query);
+    Task ConfirmTeacher(ConfirmAccountQuery query);
 }

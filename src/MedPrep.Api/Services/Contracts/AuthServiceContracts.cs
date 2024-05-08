@@ -25,7 +25,7 @@ public static class AuthServiceContracts
 
     public record RefreshQuery(string RefreshToken);
 
-    public record RegisterUserQuery(
+    public record RegisterUserCommand(
         string Email,
         string Username,
         string Password,
@@ -33,11 +33,13 @@ public static class AuthServiceContracts
         string Lastname
     );
 
-    public record RegisterTeacherQuery(
+    public record RegisterTeacherCommand(
         string Email,
         string Username,
         string Password,
         string Firstname,
         string Lastname
     );
+
+    public record ConfirmAccountQuery(Guid UserId, string Token);
 }

@@ -61,4 +61,9 @@ public class UserRepository(MedPrepContext context) : IUserRepository
         }
         return Task.CompletedTask;
     }
+
+    public Task<RefreshToken?> GetRefreshTokenAsync(Guid userId, string refreshToken) =>
+        this.context.RefreshToken.FirstOrDefaultAsync(t =>
+            t.AccountId == userId && t.Token == refreshToken
+        );
 }

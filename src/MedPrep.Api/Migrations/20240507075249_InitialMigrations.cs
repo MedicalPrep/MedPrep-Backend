@@ -31,17 +31,14 @@ namespace MedPrep.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Firstname = table.Column<string>(type: "text", nullable: false),
+                    Lastname = table.Column<string>(type: "text", nullable: false),
                     AccountType = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Firstname = table.Column<string>(type: "text", nullable: true),
-                    Lastname = table.Column<string>(type: "text", nullable: true),
-                    Password = table.Column<string>(type: "text", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: true),
-                    User_Firstname = table.Column<string>(type: "text", nullable: true),
-                    User_Lastname = table.Column<string>(type: "text", nullable: true),
                     Username = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -227,6 +224,31 @@ namespace MedPrep.Api.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshToken",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    ExpiresOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RevokedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshToken", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshToken_AspNetUsers_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -426,22 +448,10 @@ namespace MedPrep.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_IsDeleted",
-                table: "AspNetUsers",
-                column: "IsDeleted",
-                filter: "IsDeleted = 0");
-
-            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CourseModule_IsDeleted",
-                table: "CourseModule",
-                column: "IsDeleted",
-                filter: "IsDeleted = 0");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseModule_PlaylistId",
@@ -459,21 +469,9 @@ namespace MedPrep.Api.Migrations
                 column: "PurchasersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_License_IsDeleted",
-                table: "License",
-                column: "IsDeleted",
-                filter: "IsDeleted = 0");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_License_TeacherId",
                 table: "License",
                 column: "TeacherId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Playlist_IsDeleted",
-                table: "Playlist",
-                column: "IsDeleted",
-                filter: "IsDeleted = 0");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Playlist_TeacherId",
@@ -486,10 +484,9 @@ namespace MedPrep.Api.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubtitleSource_IsDeleted",
-                table: "SubtitleSource",
-                column: "IsDeleted",
-                filter: "IsDeleted = 0");
+                name: "IX_RefreshToken_AccountId",
+                table: "RefreshToken",
+                column: "AccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubtitleSource_VideoId",
@@ -507,21 +504,9 @@ namespace MedPrep.Api.Migrations
                 column: "CourseModuleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Video_IsDeleted",
-                table: "Video",
-                column: "IsDeleted",
-                filter: "IsDeleted = 0");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Video_TeacherId",
                 table: "Video",
                 column: "TeacherId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VideoSource_IsDeleted",
-                table: "VideoSource",
-                column: "IsDeleted",
-                filter: "IsDeleted = 0");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VideoSource_VideoId",
@@ -552,6 +537,9 @@ namespace MedPrep.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "License");
+
+            migrationBuilder.DropTable(
+                name: "RefreshToken");
 
             migrationBuilder.DropTable(
                 name: "SubtitleSource");

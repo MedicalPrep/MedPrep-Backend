@@ -13,4 +13,5 @@ public interface IUserRepository
     Task<User?> SaveAsync(User user);
     Task DeleteAsync(User user);
     Task UpdateAsync(User user);
+    Task<RefreshToken?> GetRefreshTokenAsync(Guid userId, string refreshToken);
 }

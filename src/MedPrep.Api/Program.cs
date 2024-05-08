@@ -1,4 +1,7 @@
 using MedPrep.Api.Extensions;
+using Microsoft.AspNetCore.Mvc;
+
+[assembly: ApiController]
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,7 @@ builder.Services.AddIdentityContext();
 builder.Services.AddRepositories();
 builder.Services.AddServices();
 builder.Services.AddExceptionsHandlers();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -28,6 +32,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapControllers();
 
 var summaries = new[]
 {

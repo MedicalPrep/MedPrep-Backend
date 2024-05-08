@@ -15,7 +15,7 @@ public class JwtService(IOptions<AuthTokenConfig> config) : IJwtService
     private readonly AuthTokenConfig config = config.Value;
     private readonly JwtSecurityTokenHandler tokenHandler = new();
 
-    public JwtServiceContracts.AccessTokenResult GenerateAccessToken(List<Claim> claims)
+    public JwtServiceContracts.AccessTokenResult GenerateAccessToken(ICollection<Claim> claims)
     {
         var authSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(this.config.AccessTokenSecret)
@@ -35,7 +35,7 @@ public class JwtService(IOptions<AuthTokenConfig> config) : IJwtService
         return new(this.tokenHandler.WriteToken(accessToken), accessToken.ValidTo);
     }
 
-    public JwtServiceContracts.RefreshTokenResult GenerateRefreshToken(List<Claim> claims)
+    public JwtServiceContracts.RefreshTokenResult GenerateRefreshToken(ICollection<Claim> claims)
     {
         var authSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(this.config.RefreshTokenSecret)
@@ -55,7 +55,89 @@ public class JwtService(IOptions<AuthTokenConfig> config) : IJwtService
         return new(this.tokenHandler.WriteToken(refreshToken), refreshToken.ValidTo);
     }
 
-    public bool IsAccessTokenValid(string accessToken) => throw new NotImplementedException();
+    public async Task<bool> IsAccessTokenValid(string accessToken)
+    {
+        var tokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateLifetime = false,
+            ValidIssuer = this.config.Issuer,
+            ValidAudience = this.config.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(this.config.AccessTokenSecret)
+            ),
+        };
+        var result = await this.tokenHandler.ValidateTokenAsync(
+            accessToken,
+            tokenValidationParameters
+        );
 
-    public bool IsRefreshTokenValid(string refreshToken) => throw new NotImplementedException();
+        return result.IsValid;
+    }
+
+    public async Task<bool> IsRefreshTokenValid(string refreshToken)
+    {
+        var tokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateLifetime = false,
+            ValidIssuer = this.config.Issuer,
+            ValidAudience = this.config.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(this.config.RefreshTokenSecret)
+            ),
+        };
+        var result = await this.tokenHandler.ValidateTokenAsync(
+            refreshToken,
+            tokenValidationParameters
+        );
+
+        return result.IsValid;
+    }
+
+    public async Task<IEnumerable<Claim>?> DecodeAccessTokenClaims(string accessToken)
+    {
+        var tokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateLifetime = false,
+            ValidIssuer = this.config.Issuer,
+            ValidAudience = this.config.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(this.config.AccessTokenSecret)
+            ),
+        };
+        var result = await this.tokenHandler.ValidateTokenAsync(
+            accessToken,
+            tokenValidationParameters
+        );
+
+        if (result.Exception is null)
+        {
+            return null;
+        }
+
+        return result.ClaimsIdentity.Claims;
+    }
+
+    public async Task<IEnumerable<Claim>?> DecodeRefreshTokenClaims(string refreshToken)
+    {
+        var tokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateLifetime = false,
+            ValidIssuer = this.config.Issuer,
+            ValidAudience = this.config.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(this.config.RefreshTokenSecret)
+            ),
+        };
+        var result = await this.tokenHandler.ValidateTokenAsync(
+            refreshToken,
+            tokenValidationParameters
+        );
+
+        if (result.Exception is null)
+        {
+            return null;
+        }
+
+        return result.ClaimsIdentity.Claims;
+    }
 }

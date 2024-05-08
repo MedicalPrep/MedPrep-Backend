@@ -54,7 +54,6 @@ namespace MedPrep.Api.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -67,8 +66,16 @@ namespace MedPrep.Api.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Lastname")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -100,7 +107,6 @@ namespace MedPrep.Api.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserName")
@@ -108,9 +114,6 @@ namespace MedPrep.Api.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IsDeleted")
-                        .HasFilter("IsDeleted = 0");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -171,9 +174,6 @@ namespace MedPrep.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IsDeleted")
-                        .HasFilter("IsDeleted = 0");
-
                     b.HasIndex("PlaylistId");
 
                     b.HasIndex("TeacherId");
@@ -230,9 +230,6 @@ namespace MedPrep.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IsDeleted")
-                        .HasFilter("IsDeleted = 0");
-
                     b.HasIndex("TeacherId");
 
                     b.ToTable("License");
@@ -281,14 +278,49 @@ namespace MedPrep.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IsDeleted")
-                        .HasFilter("IsDeleted = 0");
-
                     b.HasIndex("TeacherId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Playlist");
+                });
+
+            modelBuilder.Entity("MedPrep.Api.Models.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("RevokedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("MedPrep.Api.Models.Role", b =>
@@ -355,9 +387,6 @@ namespace MedPrep.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IsDeleted")
-                        .HasFilter("IsDeleted = 0");
-
                     b.HasIndex("VideoId");
 
                     b.ToTable("SubtitleSource");
@@ -401,9 +430,6 @@ namespace MedPrep.Api.Migrations
 
                     b.HasIndex("CourseModuleId");
 
-                    b.HasIndex("IsDeleted")
-                        .HasFilter("IsDeleted = 0");
-
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Video");
@@ -437,9 +463,6 @@ namespace MedPrep.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IsDeleted")
-                        .HasFilter("IsDeleted = 0");
 
                     b.HasIndex("VideoId");
 
@@ -568,18 +591,6 @@ namespace MedPrep.Api.Migrations
                 {
                     b.HasBaseType("MedPrep.Api.Models.Common.Account");
 
-                    b.Property<string>("Firstname")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Lastname")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -590,29 +601,12 @@ namespace MedPrep.Api.Migrations
                 {
                     b.HasBaseType("MedPrep.Api.Models.Common.Account");
 
-                    b.Property<string>("Firstname")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Lastname")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasIndex("Email")
                         .IsUnique();
-
-                    b.ToTable("AspNetUsers", t =>
-                        {
-                            t.Property("Firstname")
-                                .HasColumnName("User_Firstname");
-
-                            t.Property("Lastname")
-                                .HasColumnName("User_Lastname");
-                        });
 
                     b.HasDiscriminator().HasValue(1);
                 });
@@ -673,6 +667,17 @@ namespace MedPrep.Api.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("MedPrep.Api.Models.RefreshToken", b =>
+                {
+                    b.HasOne("MedPrep.Api.Models.Common.Account", "Account")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("MedPrep.Api.Models.SubtitleSource", b =>
@@ -776,6 +781,11 @@ namespace MedPrep.Api.Migrations
                         .HasForeignKey("VideoPurchasesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MedPrep.Api.Models.Common.Account", b =>
+                {
+                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("MedPrep.Api.Models.CourseModule", b =>

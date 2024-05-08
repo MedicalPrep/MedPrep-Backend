@@ -51,6 +51,7 @@ public class AuthService(
 
         var authClaims = new List<Claim>
         {
+            new(ClaimTypes.NameIdentifier, teacher.Id.ToString()),
             new(ClaimTypes.Name, teacher.Email!),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
@@ -64,12 +65,14 @@ public class AuthService(
 
         var refreshToken = this.jwtService.GenerateRefreshToken(authClaims);
 
-        var result = await this.teacherManager.SetAuthenticationTokenAsync(
-            teacher,
-            "RefreshToken",
-            "",
-            refreshToken.RefreshToken
-        );
+        var refreshTokenModel = new RefreshToken
+        {
+            Token = refreshToken.RefreshToken,
+            ExpiresOn = refreshToken.RefreshTokenExpiration
+        };
+
+        teacher.RefreshTokens.Add(refreshTokenModel);
+        var result = await this.teacherManager.UpdateAsync(teacher);
 
         if (result.Succeeded is false)
         {
@@ -86,6 +89,7 @@ public class AuthService(
             throw unexpectedErrr;
         }
 
+        await this.unitOfWork.SaveChangesAsync();
         return new AuthTeacherResult(
             teacher.Id,
             teacher.Email!,
@@ -108,6 +112,7 @@ public class AuthService(
 
         var authClaims = new List<Claim>
         {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.Email!),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
@@ -121,12 +126,14 @@ public class AuthService(
 
         var refreshToken = this.jwtService.GenerateRefreshToken(authClaims);
 
-        var result = await this.userManager.SetAuthenticationTokenAsync(
-            user,
-            "RefreshToken",
-            "",
-            refreshToken.RefreshToken
-        );
+        var refreshTokenModel = new RefreshToken
+        {
+            Token = refreshToken.RefreshToken,
+            ExpiresOn = refreshToken.RefreshTokenExpiration
+        };
+
+        user.RefreshTokens.Add(refreshTokenModel);
+        var result = await this.userManager.UpdateAsync(user);
 
         if (result.Succeeded is false)
         {
@@ -143,6 +150,8 @@ public class AuthService(
             throw unexpectedErr;
         }
 
+        await this.unitOfWork.SaveChangesAsync();
+
         return new AuthUserResult(
             user.Id,
             user.Email!,
@@ -154,15 +163,156 @@ public class AuthService(
         );
     }
 
-    public Task<AuthUserResult> RefrehsUserToken(RefreshQuery query)
+    /// <summary>
+    ///  Method <c>RefreshUserToken</c> refreshes the user refresh token.
+    ///  The refresh token is decoded and if everything checks out, the token is
+    ///  refreshed.
+    ///  </summary>
+    ///  <param name="query"> Contains the refresh Token.</param>
+    /// <exception cref="UnauthorizedException">Thrown if the refresh token is
+    /// invalid.</exception>
+    public async Task<AuthUserResult> RefreshUserToken(RefreshQuery query)
     {
-        throw new NotImplementedException();
+        if (await this.jwtService.IsRefreshTokenValid(query.RefreshToken) is false)
+        {
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+
+        var claims =
+            await this.jwtService.DecodeRefreshTokenClaims(query.RefreshToken)
+            ?? throw new UnauthorizedException("Invalid refresh token");
+
+        var userIdClaim =
+            claims
+                .Where(x => x.Type == ClaimTypes.NameIdentifier)
+                .Select(x => x.Value)
+                .FirstOrDefault() ?? throw new UnauthorizedException("Invalid refresh token");
+
+        var userId = Guid.Parse(userIdClaim);
+
+        var refreshTokenModel =
+            await this.userRepository.GetRefreshTokenAsync(userId, query.RefreshToken)
+            ?? throw new UnauthorizedException("Invalid refresh token");
+
+        if (refreshTokenModel.Account is not User user)
+        {
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+
+        if (refreshTokenModel.IsRevoked)
+        {
+            foreach (var token in user.RefreshTokens)
+            {
+                token.RevokedOn = DateTime.Now;
+            }
+            await this.unitOfWork.SaveChangesAsync();
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+
+        if (refreshTokenModel.IsExpired)
+        {
+            refreshTokenModel.RevokedOn = DateTime.Now;
+            await this.unitOfWork.SaveChangesAsync();
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+
+        refreshTokenModel.RevokedOn = DateTime.Now;
+        var claimsList = claims.ToList();
+        var accessToken = this.jwtService.GenerateAccessToken(claimsList);
+        var refreshToken = this.jwtService.GenerateRefreshToken(claimsList);
+
+        var newRefreshTokenModel = new RefreshToken
+        {
+            Token = refreshToken.RefreshToken,
+            ExpiresOn = refreshToken.RefreshTokenExpiration
+        };
+
+        user!.RefreshTokens.Add(newRefreshTokenModel);
+        var result = await this.userManager.UpdateAsync(user);
+        await this.unitOfWork.SaveChangesAsync();
+
+        return new AuthUserResult(
+            user.Id,
+            user.Email!,
+            user.Username,
+            accessToken.AccessToken,
+            accessToken.AccessTokenExpiration,
+            refreshToken.RefreshToken,
+            refreshToken.RefreshTokenExpiration
+        );
     }
 
-    public Task<AuthTeacherResult> RefreshTeacherToken(RefreshQuery query) =>
-        throw new NotImplementedException();
+    public async Task<AuthTeacherResult> RefreshTeacherToken(RefreshQuery query)
+    {
+        if (await this.jwtService.IsRefreshTokenValid(query.RefreshToken) is false)
+        {
+            throw new UnauthorizedException("Invalid refresh token");
+        }
 
-    public async Task RegisterTeacher(RegisterTeacherQuery query)
+        var claims =
+            await this.jwtService.DecodeRefreshTokenClaims(query.RefreshToken)
+            ?? throw new UnauthorizedException("Invalid refresh token");
+
+        var teacherIdClaims =
+            claims
+                .Where(x => x.Type == ClaimTypes.NameIdentifier)
+                .Select(x => x.Value)
+                .FirstOrDefault() ?? throw new UnauthorizedException("Invalid refresh token");
+
+        var teacherId = Guid.Parse(teacherIdClaims);
+
+        var refreshTokenModel =
+            await this.teacherRepository.GetRefreshTokenAsync(teacherId, query.RefreshToken)
+            ?? throw new UnauthorizedException("Invalid refresh token");
+
+        if (refreshTokenModel.Account is not Teacher teacher)
+        {
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+
+        if (refreshTokenModel.IsRevoked)
+        {
+            foreach (var token in teacher.RefreshTokens)
+            {
+                token.RevokedOn = DateTime.Now;
+            }
+            await this.unitOfWork.SaveChangesAsync();
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+
+        if (refreshTokenModel.IsExpired)
+        {
+            refreshTokenModel.RevokedOn = DateTime.Now;
+            await this.unitOfWork.SaveChangesAsync();
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+
+        refreshTokenModel.RevokedOn = DateTime.Now;
+        var claimsList = claims.ToList();
+        var accessToken = this.jwtService.GenerateAccessToken(claimsList);
+        var refreshToken = this.jwtService.GenerateRefreshToken(claimsList);
+
+        var newRefreshTokenModel = new RefreshToken
+        {
+            Token = refreshToken.RefreshToken,
+            ExpiresOn = refreshToken.RefreshTokenExpiration
+        };
+
+        teacher!.RefreshTokens.Add(newRefreshTokenModel);
+        var result = await this.teacherManager.UpdateAsync(teacher);
+        await this.unitOfWork.SaveChangesAsync();
+
+        return new AuthTeacherResult(
+            teacher.Id,
+            teacher.Email!,
+            accessToken.AccessToken,
+            accessToken.AccessTokenExpiration,
+            refreshToken.RefreshToken,
+            refreshToken.RefreshTokenExpiration
+        );
+    }
+
+    public async Task RegisterTeacher(RegisterTeacherCommand query)
     {
         if (await this.teacherRepository.CheckEmailAsync(query.Email))
         {
@@ -212,7 +362,7 @@ public class AuthService(
         }
     }
 
-    public async Task RegisterUser(RegisterUserQuery query)
+    public async Task RegisterUser(RegisterUserCommand query)
     {
         if (await this.userRepository.CheckEmailAsync(query.Email))
         {
@@ -274,6 +424,36 @@ public class AuthService(
             "Confirm Email",
             $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>;."
         );
+        return;
+    }
+
+    public async Task ConfirmUser(ConfirmAccountQuery query)
+    {
+        var user =
+            await this.userManager.FindByIdAsync(query.UserId.ToString())
+            ?? throw new NotFoundException("Account not found");
+
+        var result = await this.userManager.ConfirmEmailAsync(user, query.Token);
+
+        if (result.Succeeded is false)
+        {
+            throw new UnauthorizedException("Invalid Token");
+        }
+        return;
+    }
+
+    public async Task ConfirmTeacher(ConfirmAccountQuery query)
+    {
+        var teacher =
+            await this.teacherManager.FindByIdAsync(query.UserId.ToString())
+            ?? throw new NotFoundException("Account not found");
+
+        var result = await this.teacherManager.ConfirmEmailAsync(teacher, query.Token);
+
+        if (result.Succeeded is false)
+        {
+            throw new UnauthorizedException("Invalid Token");
+        }
         return;
     }
 }

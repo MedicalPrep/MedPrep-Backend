@@ -6,8 +6,6 @@ using Microsoft.EntityFrameworkCore;
 [Index(nameof(Email), IsUnique = true)]
 public class User : Account, IBaseEntity
 {
-    public string Firstname { get; set; } = string.Empty;
-    public string Lastname { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
 
     // References

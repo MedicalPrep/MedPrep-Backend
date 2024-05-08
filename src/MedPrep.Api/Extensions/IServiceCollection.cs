@@ -35,12 +35,19 @@ public static class IService
         return services;
     }
 
-    public static IServiceCollection AddIdentityContext(
-        this IServiceCollection services
-    ){
-
+    public static IServiceCollection AddIdentityContext(this IServiceCollection services)
+    {
         _ = services
-            .AddIdentity<Account, Role>()
+            .AddIdentity<Account, Role>(options =>
+            {
+                options.User.RequireUniqueEmail = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 3;
+                options.Password.RequiredUniqueChars = 0;
+            })
             .AddEntityFrameworkStores<MedPrepContext>()
             .AddDefaultTokenProviders();
         _ = services
