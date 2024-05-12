@@ -23,18 +23,18 @@ public class UserRepository(MedPrepContext context) : IUserRepository
         this.context.User.FirstOrDefaultAsync(t => t.Email == email);
 
     public Task<User?> GetbyUsernameAsync(string username) =>
-        this.context.User.FirstOrDefaultAsync(t => t.Username == username);
+        this.context.User.FirstOrDefaultAsync(t => t.UserName == username);
 
     public Task<User?> GetbyUsernameOrEmailAsync(string usernameOrEmail) =>
         this.context.User.FirstOrDefaultAsync(t =>
-            t.Username == usernameOrEmail || t.Email == usernameOrEmail
+            t.UserName == usernameOrEmail || t.Email == usernameOrEmail
         );
 
     public Task<User?> GetbyIdAsync(Guid id) =>
         this.context.User.FirstOrDefaultAsync(t => t.Id == id);
 
     public Task<bool> CheckUsernameAsync(string username) =>
-        this.context.User.AnyAsync(u => u.Username == username);
+        this.context.User.AnyAsync(u => u.UserName == username);
 
     public Task<bool> CheckEmailAsync(string email) =>
         this.context.User.AnyAsync(u => u.Email == email);
@@ -63,7 +63,7 @@ public class UserRepository(MedPrepContext context) : IUserRepository
     }
 
     public Task<RefreshToken?> GetRefreshTokenAsync(Guid userId, string refreshToken) =>
-        this.context.RefreshToken.FirstOrDefaultAsync(t =>
-            t.AccountId == userId && t.Token == refreshToken
-        );
+        this
+            .context.RefreshToken.Include(t => t.Account)
+            .FirstOrDefaultAsync(t => t.AccountId == userId && t.Token == refreshToken);
 }

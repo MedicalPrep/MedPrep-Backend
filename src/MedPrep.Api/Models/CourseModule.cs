@@ -1,7 +1,6 @@
 namespace MedPrep.Api.Models;
 
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using MedPrep.Api.Models.Common;
 
 public class CourseModule : IBaseEntity, ISoftDeletable
@@ -22,11 +21,9 @@ public class CourseModule : IBaseEntity, ISoftDeletable
     public Teacher Teacher { get; set; } = null!;
     public ICollection<User> Purchasers { get; } = new List<User>();
 
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 
     // soft deletable
     public bool IsDeleted { get; set; }

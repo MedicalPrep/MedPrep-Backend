@@ -14,7 +14,12 @@ public class EmailService(IOptions<EmailConfig> emailConfig) : IEmailService
     {
         var client = new SmtpClient(this.emailConfig.Host, this.emailConfig.Port)
         {
-            Credentials = new NetworkCredential(this.emailConfig.From, this.emailConfig.Password),
+            Credentials = new NetworkCredential(
+                this.emailConfig.Username,
+                this.emailConfig.Password
+            ),
+            UseDefaultCredentials = false,
+            DeliveryMethod = SmtpDeliveryMethod.Network,
             EnableSsl = true,
         };
 

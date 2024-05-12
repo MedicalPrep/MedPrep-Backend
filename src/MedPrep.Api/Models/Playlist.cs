@@ -1,7 +1,6 @@
 namespace MedPrep.Api.Models;
 
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using MedPrep.Api.Models.Common;
 
 public class Playlist : IBaseEntity, ISoftDeletable
@@ -19,11 +18,9 @@ public class Playlist : IBaseEntity, ISoftDeletable
     public Guid TeacherId { get; set; }
     public Teacher Teacher { get; set; } = null!;
 
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 
     // soft deletable
     public bool IsDeleted { get; set; }

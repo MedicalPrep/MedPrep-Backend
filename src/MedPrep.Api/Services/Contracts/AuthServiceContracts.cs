@@ -7,18 +7,18 @@ public static class AuthServiceContracts
         string Email,
         string Username,
         string AccessToken,
-        DateTime AccessTokenExpiration,
+        DateTimeOffset AccessTokenExpiration,
         string RefreshToken,
-        DateTime RefreshTokenExpiration
+        DateTimeOffset RefreshTokenExpiration
     );
 
     public record AuthTeacherResult(
         Guid Id,
         string Email,
         string AccessToken,
-        DateTime AccessTokenExpiration,
+        DateTimeOffset AccessTokenExpiration,
         string RefreshToken,
-        DateTime RefreshTokenExpiration
+        DateTimeOffset RefreshTokenExpiration
     );
 
     public record LoginQuery(string EmailOrUsername, string Password);

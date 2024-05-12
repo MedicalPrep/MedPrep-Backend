@@ -15,11 +15,9 @@ public class Video : IBaseEntity, ISoftDeletable
     public ICollection<SubtitleSource> SubtitleSources { get; } = new List<SubtitleSource>();
     public ICollection<User> Purchasers { get; } = new List<User>();
 
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 
     // soft deletable
     public bool IsDeleted { get; set; }

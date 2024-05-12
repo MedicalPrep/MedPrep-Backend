@@ -139,29 +139,35 @@ public class AuthController(IAuthService authService) : Controller
         return this.Ok(response);
     }
 
-    [HttpPost("confirm/user")]
+    [HttpGet("confirm/user")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> ConfirmUser([FromBody] ConfirmAccountRequest request)
+    public async Task<ActionResult> ConfirmUser(
+        [FromQuery(Name = "id")] Guid userId,
+        [FromQuery(Name = "token")] string token
+    )
     {
-        var query = new ConfirmAccountQuery(request.UserId, request.Token);
+        var query = new ConfirmAccountQuery(userId, token);
 
         await this.authService.ConfirmUser(query);
 
-        return this.Ok();
+        return this.Ok("Email Confirmed!!!");
     }
 
-    [HttpPost("confirm/teacher")]
+    [HttpGet("confirm/teacher")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> ConfirmTeacher([FromBody] ConfirmAccountRequest request)
+    public async Task<ActionResult> ConfirmTeacher(
+        [FromQuery(Name = "id")] Guid userId,
+        [FromQuery(Name = "token")] string token
+    )
     {
-        var query = new ConfirmAccountQuery(request.UserId, request.Token);
+        var query = new ConfirmAccountQuery(userId, token);
 
         await this.authService.ConfirmTeacher(query);
 
-        return this.Ok();
+        return this.Ok("Email Confirmed!!!");
     }
 }

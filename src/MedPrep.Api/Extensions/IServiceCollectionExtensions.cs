@@ -3,6 +3,7 @@ namespace MedPrep.Api.Extensions;
 using System.Text;
 using MedPrep.Api.Config;
 using MedPrep.Api.Context;
+using MedPrep.Api.Custom.Identity;
 using MedPrep.Api.ExceptionHandlers;
 using MedPrep.Api.Exceptions;
 using MedPrep.Api.Models;
@@ -15,7 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-public static class IService
+public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddAppConfig(
         this IServiceCollection services,
@@ -31,6 +32,9 @@ public static class IService
 
     public static IServiceCollection AddAppContext(this IServiceCollection services)
     {
+        _ = services.AddScoped<IUserStore<Account>, CustomAccountStore>();
+        _ = services.AddScoped<IUserStore<Teacher>, CustomTeacherStore>();
+        _ = services.AddScoped<IUserStore<User>, CustomUserStore>();
         _ = services.AddDbContext<MedPrepContext>();
         return services;
     }
@@ -41,6 +45,7 @@ public static class IService
             .AddIdentity<Account, Role>(options =>
             {
                 options.User.RequireUniqueEmail = false;
+                options.SignIn.RequireConfirmedEmail = true;
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
@@ -53,11 +58,13 @@ public static class IService
         _ = services
             .AddIdentityCore<User>()
             .AddRoles<Role>()
-            .AddEntityFrameworkStores<MedPrepContext>();
+            .AddEntityFrameworkStores<MedPrepContext>()
+            .AddDefaultTokenProviders();
         _ = services
             .AddIdentityCore<Teacher>()
             .AddRoles<Role>()
-            .AddEntityFrameworkStores<MedPrepContext>();
+            .AddEntityFrameworkStores<MedPrepContext>()
+            .AddDefaultTokenProviders();
         return services;
     }
 
@@ -111,6 +118,7 @@ public static class IService
     {
         _ = services.AddExceptionHandler<BadRequestExceptionHandler>();
         _ = services.AddExceptionHandler<ConflictExceptionHandler>();
+        _ = services.AddExceptionHandler<UnauthorizedExceptionHandler>();
         _ = services.AddExceptionHandler<NotFoundExceptionHandler>();
         _ = services.AddExceptionHandler<ConflictExceptionHandler>();
         _ = services.AddExceptionHandler<GlobalExceptionHandler>();

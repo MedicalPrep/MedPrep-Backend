@@ -4,10 +4,8 @@ using MedPrep.Api.Models.Common;
 using Microsoft.EntityFrameworkCore;
 
 [Index(nameof(Email), IsUnique = true)]
-public class User : Account, IBaseEntity
+public class User : Account
 {
-    public string Username { get; set; } = string.Empty;
-
     // References
     public ICollection<Playlist> PlaylistPurchases { get; set; } = new List<Playlist>();
     public ICollection<CourseModule> CourseModulePurchases { get; set; } = new List<CourseModule>();

@@ -22,6 +22,21 @@ touch appsettings.Development.json
 
 5. Install all dependencies
 
+6. You will need to make sure your database is updated to the latest migrations. Make sure to update the appsettings.Development.json file with the right data as indicated in step 4. You can run these command to interact with your database:
+
+```bash
+dotnet ef database update --project ./src/MedPrep.Api # Update database to latest migration
+
+```
+
+```bash
+dotnet ef database drop -p ./src/MedPrep.Api # Drop database incase of braking changes in migration
+```
+
+```bash
+dotnet ef migrations add <MigrationName> -p=./src/MedPrep.Api # Creates a new migration with specified name. Please make sure to make name Camel case e.g "InitialMigrations"
+```
+
 6. Start the application
 
 ```bash
@@ -52,4 +67,23 @@ dotnet run --project ./src/MedPrep.Api
 
 ```bash
 dotnet watch run --project ./src/MedPrep.Api
+```
+
+-   Update Database
+
+```bash
+dotnet ef database update --project ./src/MedPrep.Api # Update database to latest migration
+
+```
+
+-   Drop database
+
+```bash
+dotnet ef database drop -p ./src/MedPrep.Api # Drop database incase of braking changes in migration
+```
+
+-   Add new Migration
+
+```bash
+dotnet ef migrations add <MigrationName> -p=./src/MedPrep.Api # Creates a new migration with specified name. Please make sure to make name Camel case e.g "InitialMigrations"
 ```

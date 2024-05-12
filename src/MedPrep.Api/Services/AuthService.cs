@@ -2,13 +2,16 @@ namespace MedPrep.Api.Services;
 
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using MedPrep.Api.Config;
 using MedPrep.Api.Exceptions;
 using MedPrep.Api.Models;
+using MedPrep.Api.Models.Common;
 using MedPrep.Api.Repositories.Common;
 using MedPrep.Api.Services.Common;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static MedPrep.Api.Services.Contracts.AuthServiceContracts;
@@ -44,7 +47,7 @@ public class AuthService(
             || !await this.teacherManager.CheckPasswordAsync(teacher, query.Password)
         )
         {
-            throw new ConflictException("Invalid email or password");
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         var teacherRoles = await this.teacherManager.GetRolesAsync(teacher);
@@ -105,7 +108,12 @@ public class AuthService(
         var user = await this.userRepository.GetbyUsernameOrEmailAsync(query.EmailOrUsername);
         if (user is null || !await this.userManager.CheckPasswordAsync(user, query.Password))
         {
-            throw new ConflictException("Invalid email or password");
+            throw new UnauthorizedException("Invalid email or password");
+        }
+
+        if (user.EmailConfirmed is false)
+        {
+            throw new UnauthorizedException("Please confirm your email address");
         }
 
         var userRoles = await this.userManager.GetRolesAsync(user);
@@ -155,7 +163,7 @@ public class AuthService(
         return new AuthUserResult(
             user.Id,
             user.Email!,
-            user.Username,
+            user.UserName ?? "",
             accessToken.AccessToken,
             accessToken.AccessTokenExpiration,
             refreshToken.RefreshToken,
@@ -203,7 +211,7 @@ public class AuthService(
         {
             foreach (var token in user.RefreshTokens)
             {
-                token.RevokedOn = DateTime.Now;
+                token.RevokedOn = DateTimeOffset.UtcNow;
             }
             await this.unitOfWork.SaveChangesAsync();
             throw new UnauthorizedException("Invalid refresh token");
@@ -211,12 +219,12 @@ public class AuthService(
 
         if (refreshTokenModel.IsExpired)
         {
-            refreshTokenModel.RevokedOn = DateTime.Now;
+            refreshTokenModel.RevokedOn = DateTimeOffset.UtcNow;
             await this.unitOfWork.SaveChangesAsync();
             throw new UnauthorizedException("Invalid refresh token");
         }
 
-        refreshTokenModel.RevokedOn = DateTime.Now;
+        refreshTokenModel.RevokedOn = DateTimeOffset.UtcNow;
         var claimsList = claims.ToList();
         var accessToken = this.jwtService.GenerateAccessToken(claimsList);
         var refreshToken = this.jwtService.GenerateRefreshToken(claimsList);
@@ -234,7 +242,7 @@ public class AuthService(
         return new AuthUserResult(
             user.Id,
             user.Email!,
-            user.Username,
+            user.UserName ?? "",
             accessToken.AccessToken,
             accessToken.AccessTokenExpiration,
             refreshToken.RefreshToken,
@@ -326,33 +334,35 @@ public class AuthService(
             var teacher = new Teacher()
             {
                 Email = query.Email,
-                Firstname = query.Firstname,
-                Lastname = query.Lastname,
+                UserName = query.Email,
+                FirstName = query.Firstname,
+                LastName = query.Lastname,
             };
             var result = await this.teacherManager.CreateAsync(teacher, query.Password);
 
             if (result.Succeeded is false)
             {
-                var unexpectedErr = new InternalServerErrorException("An unexpected error occured");
-                foreach (var error in result.Errors)
-                {
-                    this.logger.LogError(
-                        unexpectedErr,
-                        "User Registration Error: {Message}",
-                        error.Description
-                    );
-                }
-                throw unexpectedErr;
+                throw new InternalServerErrorException(result.Errors.First().Description);
             }
-            var token = await this.teacherManager.GenerateEmailConfirmationTokenAsync(teacher);
+            await this.unitOfWork.SaveChangesAsync();
+            result = await this.teacherManager.AddToRoleAsync(
+                teacher,
+                UserRoles.Teacher.ToString()
+            );
 
-            var confirmationLink =
-                $"{this.redirectionConfig.ConfirmationUrl}/?token={token}&id={teacher.Id}";
-
-            await this.SendConfirmationEmailAsync(teacher.Email, confirmationLink);
-            _ = await this.teacherManager.AddToRoleAsync(teacher, TeacherRoles.Teacher.ToString());
+            if (result.Succeeded is false)
+            {
+                throw new InternalServerErrorException(result.Errors.First().Description);
+            }
 
             await this.unitOfWork.SaveChangesAsync();
+            var token = await this.teacherManager.GenerateEmailConfirmationTokenAsync(teacher);
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            var confirmationLink =
+                $"{this.redirectionConfig.ConfirmationUrl}/teacher?token={encodedToken}&id={teacher.Id}";
+
+            await this.SendConfirmationEmailAsync(teacher.Email, confirmationLink);
+
             this.unitOfWork.CommitTransaction();
         }
         catch (Exception)
@@ -379,35 +389,39 @@ public class AuthService(
         {
             var user = new User()
             {
-                Username = query.Username,
+                UserName = query.Username,
                 Email = query.Email,
-                Firstname = query.Firstname,
-                Lastname = query.Lastname,
+                FirstName = query.Firstname,
+                LastName = query.Lastname,
             };
             var result = await this.userManager.CreateAsync(user, query.Password);
 
             if (result.Succeeded is false)
             {
-                var unexpectedErr = new InternalServerErrorException("An unexpected error occured");
-                foreach (var error in result.Errors)
-                {
-                    this.logger.LogError(
-                        unexpectedErr,
-                        "User Registration Error: {Message}",
-                        error.Description
-                    );
-                }
-                throw unexpectedErr;
+                throw new InternalServerErrorException(result.Errors.First().Description);
             }
-            var token = await this.userManager.GenerateEmailConfirmationTokenAsync(user);
-
-            var confirmationLink =
-                $"{this.redirectionConfig.ConfirmationUrl}/?token={token}&id={user.Id}";
-
-            await this.SendConfirmationEmailAsync(user.Email, confirmationLink);
-            _ = await this.userManager.AddToRoleAsync(user, UserRoles.User.ToString());
 
             await this.unitOfWork.SaveChangesAsync();
+            result = await this.userManager.AddToRoleAsync(user, UserRoles.User.ToString());
+
+            if (result.Succeeded is false)
+            {
+                throw new InternalServerErrorException(result.Errors.First().Description);
+            }
+
+            await this.unitOfWork.SaveChangesAsync();
+
+            var token =
+                await this.userManager.GenerateEmailConfirmationTokenAsync(user)
+                ?? throw new InternalServerErrorException("An unexpected User passesed to manager");
+
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            var confirmationLink =
+                $"{this.redirectionConfig.ConfirmationUrl}/user?token={encodedToken}&id={user.Id}";
+
+            await this.SendConfirmationEmailAsync(user.Email, confirmationLink);
+
             this.unitOfWork.CommitTransaction();
         }
         catch (Exception)
@@ -417,15 +431,12 @@ public class AuthService(
         }
     }
 
-    private async Task SendConfirmationEmailAsync(string email, string confirmationLink)
-    {
-        await this.emailService.SendEmailAsync(
+    private Task SendConfirmationEmailAsync(string email, string confirmationLink) =>
+        this.emailService.SendEmailAsync(
             email,
             "Confirm Email",
             $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>;."
         );
-        return;
-    }
 
     public async Task ConfirmUser(ConfirmAccountQuery query)
     {
@@ -433,12 +444,14 @@ public class AuthService(
             await this.userManager.FindByIdAsync(query.UserId.ToString())
             ?? throw new NotFoundException("Account not found");
 
-        var result = await this.userManager.ConfirmEmailAsync(user, query.Token);
+        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(query.Token));
+        var result = await this.userManager.ConfirmEmailAsync(user, decodedToken);
 
         if (result.Succeeded is false)
         {
-            throw new UnauthorizedException("Invalid Token");
+            throw new UnauthorizedException(result.Errors.First().Description);
         }
+        await this.unitOfWork.SaveChangesAsync();
         return;
     }
 
@@ -448,12 +461,15 @@ public class AuthService(
             await this.teacherManager.FindByIdAsync(query.UserId.ToString())
             ?? throw new NotFoundException("Account not found");
 
-        var result = await this.teacherManager.ConfirmEmailAsync(teacher, query.Token);
+        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(query.Token));
+
+        var result = await this.teacherManager.ConfirmEmailAsync(teacher, decodedToken);
 
         if (result.Succeeded is false)
         {
-            throw new UnauthorizedException("Invalid Token");
+            throw new UnauthorizedException(result.Errors.First().Description);
         }
+        await this.unitOfWork.SaveChangesAsync();
         return;
     }
 }

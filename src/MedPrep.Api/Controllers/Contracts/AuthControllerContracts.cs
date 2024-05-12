@@ -9,18 +9,18 @@ public static class AuthControllerContracts
         string Email,
         string Username,
         string AccessToken,
-        DateTime AccessTokenExpiration,
+        DateTimeOffset AccessTokenExpiration,
         string RefreshToken,
-        DateTime RefreshTokenExpiration
+        DateTimeOffset RefreshTokenExpiration
     );
 
     public record LoginTeacherResponse(
         Guid Id,
         string Email,
         string AccessToken,
-        DateTime AccessTokenExpiration,
+        DateTimeOffset AccessTokenExpiration,
         string RefreshToken,
-        DateTime RefreshTokenExpiration
+        DateTimeOffset RefreshTokenExpiration
     );
 
     public record RegisterTeacherRequest(
@@ -46,18 +46,18 @@ public static class AuthControllerContracts
         string Email,
         string Username,
         string AccessToken,
-        DateTime AccessTokenExpiration,
+        DateTimeOffset AccessTokenExpiration,
         string RefreshToken,
-        DateTime RefreshTokenExpiration
+        DateTimeOffset RefreshTokenExpiration
     );
 
     public record RefreshTeacherTokenResponse(
         Guid Id,
         string Email,
         string AccessToken,
-        DateTime AccessTokenExpiration,
+        DateTimeOffset AccessTokenExpiration,
         string RefreshToken,
-        DateTime RefreshTokenExpiration
+        DateTimeOffset RefreshTokenExpiration
     );
 
     public record ConfirmAccountRequest(Guid UserId, string Token);

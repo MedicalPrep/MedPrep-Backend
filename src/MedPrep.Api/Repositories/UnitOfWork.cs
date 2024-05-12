@@ -48,19 +48,18 @@ public class UnitOfWork(MedPrepContext context) : IUnitOfWork, IDisposable
     private void AuditEntityIntercept()
     {
         var entries = this
-            .context.ChangeTracker.Entries()
-            .Where(e =>
-                e.Entity is IBaseEntity
-                && (e.State == EntityState.Added || e.State == EntityState.Modified)
-            );
+            .context.ChangeTracker.Entries<IBaseEntity>()
+            .Where(e => e.State is EntityState.Added or EntityState.Modified)
+            .Select(x => x);
+
 
         foreach (var entityEntry in entries)
         {
-            ((IBaseEntity)entityEntry.Entity).UpdatedAt = DateTime.Now;
+            entityEntry.Entity.UpdatedAt = DateTimeOffset.UtcNow;
 
             if (entityEntry.State == EntityState.Added)
             {
-                ((IBaseEntity)entityEntry.Entity).CreatedAt = DateTime.Now;
+                entityEntry.Entity.CreatedAt = DateTimeOffset.UtcNow;
             }
         }
     }

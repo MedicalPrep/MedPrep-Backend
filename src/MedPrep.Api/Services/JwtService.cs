@@ -21,10 +21,11 @@ public class JwtService(IOptions<AuthTokenConfig> config) : IJwtService
             Encoding.UTF8.GetBytes(this.config.AccessTokenSecret)
         );
 
+        var expiration = DateTimeOffset.UtcNow.AddHours(this.config.RefreshTokenExpiration);
         var accessToken = new JwtSecurityToken(
             issuer: this.config.Issuer,
             audience: this.config.Audience,
-            expires: DateTime.Now.AddHours(this.config.AccessTokenExpiration),
+            expires: expiration.DateTime,
             claims: claims,
             signingCredentials: new SigningCredentials(
                 authSigningKey,
@@ -32,7 +33,7 @@ public class JwtService(IOptions<AuthTokenConfig> config) : IJwtService
             )
         );
 
-        return new(this.tokenHandler.WriteToken(accessToken), accessToken.ValidTo);
+        return new(this.tokenHandler.WriteToken(accessToken), expiration);
     }
 
     public JwtServiceContracts.RefreshTokenResult GenerateRefreshToken(ICollection<Claim> claims)
@@ -41,10 +42,11 @@ public class JwtService(IOptions<AuthTokenConfig> config) : IJwtService
             Encoding.UTF8.GetBytes(this.config.RefreshTokenSecret)
         );
 
+        var expiration = DateTimeOffset.UtcNow.AddHours(this.config.RefreshTokenExpiration);
         var refreshToken = new JwtSecurityToken(
             issuer: this.config.Issuer,
             audience: this.config.Audience,
-            expires: DateTime.Now.AddHours(this.config.RefreshTokenExpiration),
+            expires: expiration.DateTime,
             claims: claims,
             signingCredentials: new SigningCredentials(
                 authSigningKey,
@@ -52,7 +54,7 @@ public class JwtService(IOptions<AuthTokenConfig> config) : IJwtService
             )
         );
 
-        return new(this.tokenHandler.WriteToken(refreshToken), refreshToken.ValidTo);
+        return new(this.tokenHandler.WriteToken(refreshToken), expiration);
     }
 
     public async Task<bool> IsAccessTokenValid(string accessToken)
@@ -133,7 +135,7 @@ public class JwtService(IOptions<AuthTokenConfig> config) : IJwtService
             tokenValidationParameters
         );
 
-        if (result.Exception is null)
+        if (result.Exception is not null)
         {
             return null;
         }

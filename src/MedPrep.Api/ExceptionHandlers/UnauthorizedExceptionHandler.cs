@@ -32,7 +32,7 @@ public class UnauthorizedExceptionHandler(ILogger<UnauthorizedExceptionHandler> 
 
         var problemDetails = new ProblemDetails
         {
-            Status = StatusCodes.Status400BadRequest,
+            Status = StatusCodes.Status401Unauthorized,
             Title = "Bad Request",
             Detail = unAuthorizedRequestException.Message
         };

@@ -66,6 +66,8 @@ app.MapGet(
     .WithName("GetWeatherForecast")
     .WithOpenApi();
 
+await app.Services.AddRolesAsync();
+
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
