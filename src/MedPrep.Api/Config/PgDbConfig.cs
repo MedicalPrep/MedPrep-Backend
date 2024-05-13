@@ -7,6 +7,7 @@ public class PgDbConfig
     public required string Database { get; set; }
     public required string Username { get; set; }
     public required string Password { get; set; }
+    public required string Port { get; set; }
     public string ConnectionString =>
-        $"Username={this.Username} Password={this.Password} Host={this.Host} Database={this.Database}";
+        $"Username={this.Username}; Password={this.Password}; Host={this.Host}; Database={this.Database}; Port={this.Port}";
 }

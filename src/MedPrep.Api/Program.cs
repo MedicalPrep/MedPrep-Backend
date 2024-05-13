@@ -1,4 +1,7 @@
 using MedPrep.Api.Extensions;
+using Microsoft.AspNetCore.Mvc;
+
+[assembly: ApiController]
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +14,15 @@ builder.Services.AddSwaggerGen();
 // App extensions services
 builder.Services.AddAppConfig(builder.Configuration);
 builder.Services.AddAppContext();
+builder.Services.AddIdentityContext();
+builder.Services.AddRepositories();
+builder.Services.AddServices();
+builder.Services.AddExceptionsHandlers();
+builder.Services.AddControllers();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -22,6 +32,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapControllers();
 
 var summaries = new[]
 {
@@ -54,6 +65,8 @@ app.MapGet(
     )
     .WithName("GetWeatherForecast")
     .WithOpenApi();
+
+await app.Services.AddRolesAsync();
 
 app.Run();
 
