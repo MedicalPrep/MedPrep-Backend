@@ -4,6 +4,7 @@ using MedPrep.Api.Context;
 using MedPrep.Api.Models;
 using MedPrep.Api.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 public class UserRepository(MedPrepContext context) : IUserRepository
 {
@@ -41,16 +42,17 @@ public class UserRepository(MedPrepContext context) : IUserRepository
 
     public async Task<User?> SaveAsync(User user)
     {
+        EntityEntry<User> entry;
         if (this.context.User.Any(t => t.Id == user.Id))
         {
-            _ = this.context.User.Update(user);
+            entry = this.context.User.Update(user);
         }
         else
         {
-            _ = await this.context.User.AddAsync(user);
+            entry = await this.context.User.AddAsync(user);
         }
 
-        return user;
+        return entry.Entity;
     }
 
     public Task UpdateAsync(User user)

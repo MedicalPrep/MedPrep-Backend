@@ -16,6 +16,7 @@ public class CourseModule : IBaseEntity, ISoftDeletable
     // References
     public Guid? Collection { get; set; }
     public Playlist? Playlist { get; set; }
+    public Guid? PlaylistId { get; set; }
     public ICollection<Video> Videos { get; } = new List<Video>();
     public Guid TeacherId { get; set; }
     public Teacher Teacher { get; set; } = null!;

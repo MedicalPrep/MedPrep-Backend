@@ -103,6 +103,12 @@ public static class IServiceCollectionExtensions
         _ = services.AddScoped<IUnitOfWork, UnitOfWork>();
         _ = services.AddScoped<IUserRepository, UserRepository>();
         _ = services.AddScoped<ITeacherRepository, TeacherRepository>();
+        _ = services.AddScoped<IVideoRepository, VideoRepository>();
+        _ = services.AddScoped<ICourseModuleRepository, CourseModuleRepository>();
+        _ = services.AddScoped<IPlaylistRepository, PlaylistRepository>();
+        _ = services.AddScoped<IVideoSourceRepository, VideoSourceRepository>();
+        _ = services.AddScoped<ISubtitleSourceRepository, SubtitleSourceRepository>();
+        _ = services.AddScoped<ILicenseRepository, LicenseRepository>();
         return services;
     }
 
