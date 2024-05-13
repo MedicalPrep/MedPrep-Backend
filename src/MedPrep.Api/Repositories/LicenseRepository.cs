@@ -4,14 +4,9 @@ using MedPrep.Api.Context;
 using MedPrep.Api.Models;
 using MedPrep.Api.Repositories.Common;
 
-public class LicenseRepository : ILicenseRepository
+public class LicenseRepository(MedPrepContext context) : ILicenseRepository
 {
-    private readonly MedPrepContext context;
-
-    public LicenseRepository(MedPrepContext context)
-    {
-        this.context = context;
-    }
+    private readonly MedPrepContext context = context;
 
     public void UploadLicense(License license) => this.context.License.Add(license);
 

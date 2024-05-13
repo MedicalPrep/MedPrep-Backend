@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using MedPrep.Api.Config;
 using MedPrep.Api.Exceptions;
 using MedPrep.Api.Models;
-using MedPrep.Api.Models.Common;
 using MedPrep.Api.Repositories.Common;
 using MedPrep.Api.Services.Common;
 using Microsoft.AspNetCore.Identity;

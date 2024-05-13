@@ -1,7 +1,6 @@
 namespace MedPrep.Api.Models;
 
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using MedPrep.Api.Models.Common;
 
 public class Video : IBaseEntity, ISoftDeletable
