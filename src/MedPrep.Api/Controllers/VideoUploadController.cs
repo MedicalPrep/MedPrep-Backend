@@ -1,22 +1,16 @@
 namespace MedPrep.Api.Controllers;
+
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-
 using MedPrep.Api.Services.Common;
+using Microsoft.AspNetCore.Mvc;
+using static MedPrep.Api.Controllers.Contracts.VideoUploadControllerContracts;
 using static MedPrep.Api.Services.Contracts.IVideoServiceContracts;
-
-
-
 
 [ApiController]
 [Route("api/v1/video")]
-public class VideoUploadController : Controller
+public class VideoUploadController(IVideoService videoService) : Controller
 {
-    public readonly IVideoService _iVideoService;
-    public VideoUploadController(IVideoService iVideoService)
-    {
-        this._iVideoService = iVideoService;
-    }
+    private readonly IVideoService videoService = videoService;
 
     [HttpPost]
     [Route("upload")]
@@ -25,20 +19,14 @@ public class VideoUploadController : Controller
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> UploadVideo([FromForm] VideoUploadRequest videoUpload)
     {
-        try
+        var command = new VideoUploadCommand()
         {
-            var result = await _iVideoService.UploadVideo(videoUpload);
-            return Ok(result);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Internal server error");
-        }
+            Title = videoUpload.Title,
+            Video = videoUpload.Video,
+            Description = videoUpload.Description,
+            CourseModuleId = videoUpload.CourseModuleId
+        };
+        var result = await this.videoService.UploadVideo(command);
+        return this.Ok(result);
     }
-
-
 }
