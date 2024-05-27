@@ -22,7 +22,6 @@ public class VideoUploadController(IVideoService videoService) : Controller
         var command = new VideoUploadCommand()
         {
             Title = videoUpload.Title,
-            Video = videoUpload.Video,
             Description = videoUpload.Description,
             CourseModuleId = videoUpload.CourseModuleId
         };

@@ -12,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // App extensions services
+builder.Services.AddHttpClients();
 builder.Services.AddAppConfig(builder.Configuration);
 builder.Services.AddAppContext();
 builder.Services.AddIdentityContext();

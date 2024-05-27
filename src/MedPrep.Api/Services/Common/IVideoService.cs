@@ -5,5 +5,5 @@ using static MedPrep.Api.Services.Contracts.IVideoServiceContracts;
 
 public interface IVideoService
 {
-    Task<string> UploadVideo(VideoUploadCommand videoUploadRequest);
+    Task<VideoUploadResult> UploadVideo(VideoUploadCommand command);
 }

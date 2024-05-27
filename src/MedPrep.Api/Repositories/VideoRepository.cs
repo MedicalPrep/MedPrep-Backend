@@ -58,4 +58,11 @@ public class VideoRepository(MedPrepContext context) : IVideoRepository
         Task.FromResult<IEnumerable<SubtitleSource>>(
             this.context.SubtitleSource.Where(s => s.VideoId == videoId).Select(x => x)
         );
+
+    public Task<bool> AnyAsync(Func<Video, bool> predicate)
+    {
+        var result = this.context.Video.Any(predicate);
+
+        return Task.FromResult(result);
+    }
 }

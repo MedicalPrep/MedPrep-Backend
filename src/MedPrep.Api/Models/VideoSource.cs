@@ -8,6 +8,8 @@ public class VideoSource : IBaseEntity, ISoftDeletable
     [Key]
     public Guid Id { get; set; }
     public string Source { get; set; } = string.Empty;
+    public VideoSourceType SourceType { get; set; }
+    public string ThirdPartyVideoId { get; set; } = string.Empty;
 
     // References
     public Guid VideoId { get; set; }

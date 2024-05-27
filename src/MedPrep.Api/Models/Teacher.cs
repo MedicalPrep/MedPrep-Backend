@@ -4,6 +4,7 @@ using MedPrep.Api.Models.Common;
 
 public class Teacher : Account
 {
+    public string ThirdPartyVideoCollectionId { get; set; } = string.Empty;
     public VerficationStatus Status { get; set; }
 
     // References
