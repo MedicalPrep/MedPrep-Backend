@@ -26,7 +26,7 @@ public sealed class BunnyStreamHttpClient(
         httpClient.BaseAddress = new Uri("https://video.bunnycdn.com/");
     }
 
-    public async Task<CreateCollectionResponse> CreateCollection(Guid userId)
+    public async Task<CreateCollectionResponse> CreateCollectionAsync(Guid userId)
     {
         var path = $"/library/{this.bunnySettings.LibraryId}/collections";
         var content = new Dictionary<string, string>() { { "name", userId.ToString() }, };
