@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 public class User : Account
 {
     // References
-    public ICollection<Playlist> PlaylistPurchases { get; set; } = new List<Playlist>();
-    public ICollection<CourseModule> CourseModulePurchases { get; set; } = new List<CourseModule>();
-    public ICollection<Video> VideoPurchases { get; } = new List<Video>();
+    public ICollection<Playlist> PlaylistPurchases { get; set; } = [];
+    public ICollection<CourseModule> CourseModulePurchases { get; set; } = [];
+    public ICollection<Video> VideoPurchases { get; } = [];
 }

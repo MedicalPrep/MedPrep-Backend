@@ -11,4 +11,5 @@ public interface IVideoRepository
     Task DeleteAsync(Video video);
     Task<IEnumerable<User>> GetPurchasersAsync(Guid videoId);
     Task<IEnumerable<SubtitleSource>> GetSubtitleSourcesAsync(Guid videoId);
+    Task<bool> AnyAsync(Func<Video, bool> predicate);
 }

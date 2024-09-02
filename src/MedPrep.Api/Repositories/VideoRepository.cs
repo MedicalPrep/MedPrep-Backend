@@ -13,7 +13,7 @@ public class VideoRepository(MedPrepContext context) : IVideoRepository
         Task.FromResult(this.context.Video.Where(v => v.Id == videoId).FirstOrDefault());
 
     public Task<IEnumerable<Video>> GetAllAsync() =>
-        Task.FromResult<IEnumerable<Video>>(this.context.Video.Select(v => v));
+        Task.FromResult<IEnumerable<Video>>(this.context.Video.Select(static v => v));
 
     public async Task<Video?> SaveAsync(Video video)
     {
@@ -58,4 +58,11 @@ public class VideoRepository(MedPrepContext context) : IVideoRepository
         Task.FromResult<IEnumerable<SubtitleSource>>(
             this.context.SubtitleSource.Where(s => s.VideoId == videoId).Select(x => x)
         );
+
+    public Task<bool> AnyAsync(Func<Video, bool> predicate)
+    {
+        var result = this.context.Video.Any(predicate);
+
+        return Task.FromResult(result);
+    }
 }

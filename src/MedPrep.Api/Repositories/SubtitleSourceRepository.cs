@@ -12,7 +12,7 @@ public class SubtitleSourceRepository(MedPrepContext context) : ISubtitleSourceR
         this.context.SubtitleSource.Find(name);
 
     public IEnumerable<SubtitleSource> GetAllSubtitleSources() =>
-        this.context.SubtitleSource.ToList();
+        [.. this.context.SubtitleSource];
 
     public void DeleteSubtitileSource(SubtitleSource subtitleSource) =>
         _ = this.context.SubtitleSource.Remove(subtitleSource);

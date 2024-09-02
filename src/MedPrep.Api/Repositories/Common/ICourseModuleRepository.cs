@@ -13,4 +13,6 @@ public interface ICourseModuleRepository
     IEnumerable<CourseModule> FindAll();
     IEnumerable<CourseModule> FindByTopic(string topic);
     Task<Playlist?> GetPlaylist(CourseModule courseModule);
+
+    public bool CourseModuleExists(CourseModule courseModule);
 }

@@ -17,7 +17,7 @@ public abstract class Account : IdentityUser<Guid>, IBaseEntity, ISoftDeletable
     public bool IsDeleted { get; set; }
     public DateTime? DeletedAt { get; set; }
 
-    public ICollection<RefreshToken> RefreshTokens { get; set; } = new HashSet<RefreshToken>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 }
 
 public enum AccountType

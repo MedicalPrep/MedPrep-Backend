@@ -6,6 +6,7 @@ using MedPrep.Api.Context;
 using MedPrep.Api.Custom.Identity;
 using MedPrep.Api.ExceptionHandlers;
 using MedPrep.Api.Exceptions;
+using MedPrep.Api.HttpClients;
 using MedPrep.Api.Models;
 using MedPrep.Api.Models.Common;
 using MedPrep.Api.Repositories;
@@ -27,6 +28,15 @@ public static class IServiceCollectionExtensions
         _ = services.Configure<PgDbConfig>(configuration.GetSection(PgDbConfig.Name));
         _ = services.Configure<AuthTokenConfig>(configuration.GetSection(AuthTokenConfig.Name));
         _ = services.Configure<EmailConfig>(configuration.GetSection(EmailConfig.Name));
+        return services;
+    }
+
+    public static IServiceCollection AddHttpClients(this IServiceCollection services)
+    {
+        _ = services.AddHttpClient<BunnyStreamHttpClient>(
+            BunnyStreamHttpClient.ClientName,
+            BunnyStreamHttpClient.Client
+        );
         return services;
     }
 

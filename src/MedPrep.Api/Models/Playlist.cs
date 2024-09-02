@@ -14,7 +14,7 @@ public class Playlist : IBaseEntity, ISoftDeletable
     public decimal Price { get; set; }
 
     // References
-    public ICollection<CourseModule> Modules { get; set; } = new List<CourseModule>();
+    public ICollection<CourseModule> Modules { get; set; } = [];
     public Guid TeacherId { get; set; }
     public Teacher Teacher { get; set; } = null!;
 
