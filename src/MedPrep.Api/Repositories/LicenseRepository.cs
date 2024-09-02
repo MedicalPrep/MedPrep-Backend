@@ -27,7 +27,7 @@ public class LicenseRepository(MedPrepContext context) : ILicenseRepository
     public License? GetLicenseById(Guid licenseId) =>
         this.context.License.Where(l => l.Id == licenseId).FirstOrDefault();
 
-    public IEnumerable<License> GetAllLicenses() => this.context.License.ToList();
+    public IEnumerable<License> GetAllLicenses() => [.. this.context.License];
 
     public void DeleteByIdAsync(Guid licenseId)
     {

@@ -17,7 +17,7 @@ public class VideoUploadController(IVideoService videoService) : Controller
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> UploadVideo([FromForm] VideoUploadRequest videoUpload)
+    public async Task<ActionResult<VideoUploadResponse>> UploadVideo([FromForm] VideoUploadRequest videoUpload)
     {
         var command = new VideoUploadCommand()
         {
@@ -26,6 +26,18 @@ public class VideoUploadController(IVideoService videoService) : Controller
             CourseModuleId = videoUpload.CourseModuleId
         };
         var result = await this.videoService.UploadVideo(command);
-        return this.Ok(result);
+
+        var response = new VideoUploadResponse()
+        {
+            Title = result.Title,
+            UploadEndpoint = result.UploadEndpoint,
+            ThirdPartyVideoId = result.ThirdPartyVideoId,
+            ThirdPartyVideoCollectionId = result.ThirdPartyVideoCollectionId,
+            ThirdPartyLibraryId = result.ThirdPartyLibraryId,
+            AuthorizationSignature = result.AuthorizationSignature,
+            AuthorizationExpiration = result.AuthorizationExpiration,
+        };
+
+        return this.Ok(response);
     }
 }

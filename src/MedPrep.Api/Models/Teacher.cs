@@ -8,8 +8,8 @@ public class Teacher : Account
     public VerficationStatus Status { get; set; }
 
     // References
-    public ICollection<License> License { get; } = new List<License>();
-    public ICollection<Video> Videos { get; } = new List<Video>();
-    public ICollection<CourseModule> CourseModule { get; } = new List<CourseModule>();
-    public ICollection<Playlist> Playlists { get; } = new List<Playlist>();
+    public ICollection<License> License { get; } = [];
+    public ICollection<Video> Videos { get; } = [];
+    public ICollection<CourseModule> CourseModule { get; } = [];
+    public ICollection<Playlist> Playlists { get; } = [];
 }

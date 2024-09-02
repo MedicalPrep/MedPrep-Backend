@@ -76,7 +76,7 @@ public class AuthService(
         teacher.RefreshTokens.Add(refreshTokenModel);
         var result = await this.teacherManager.UpdateAsync(teacher);
 
-        if (result.Succeeded is false)
+        if (!result.Succeeded)
         {
             var unexpectedErrr = new InternalServerErrorException("An unexpected error occured");
 
@@ -110,7 +110,7 @@ public class AuthService(
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        if (user.EmailConfirmed is false)
+        if (!user.EmailConfirmed)
         {
             throw new UnauthorizedException("Please confirm your email address");
         }
@@ -142,7 +142,7 @@ public class AuthService(
         user.RefreshTokens.Add(refreshTokenModel);
         var result = await this.userManager.UpdateAsync(user);
 
-        if (result.Succeeded is false)
+        if (!result.Succeeded)
         {
             var unexpectedErr = new InternalServerErrorException("An unexpected error occured");
 
@@ -180,7 +180,7 @@ public class AuthService(
     /// invalid.</exception>
     public async Task<AuthUserResult> RefreshUserToken(RefreshQuery query)
     {
-        if (await this.jwtService.IsRefreshTokenValid(query.RefreshToken) is false)
+        if (!await this.jwtService.IsRefreshTokenValid(query.RefreshToken))
         {
             throw new UnauthorizedException("Invalid refresh token");
         }
@@ -191,8 +191,8 @@ public class AuthService(
 
         var userIdClaim =
             claims
-                .Where(x => x.Type == ClaimTypes.NameIdentifier)
-                .Select(x => x.Value)
+                .Where(static x => x.Type == ClaimTypes.NameIdentifier)
+                .Select(static x => x.Value)
                 .FirstOrDefault() ?? throw new UnauthorizedException("Invalid refresh token");
 
         var userId = Guid.Parse(userIdClaim);
@@ -251,7 +251,7 @@ public class AuthService(
 
     public async Task<AuthTeacherResult> RefreshTeacherToken(RefreshQuery query)
     {
-        if (await this.jwtService.IsRefreshTokenValid(query.RefreshToken) is false)
+        if (!await this.jwtService.IsRefreshTokenValid(query.RefreshToken))
         {
             throw new UnauthorizedException("Invalid refresh token");
         }
@@ -262,8 +262,8 @@ public class AuthService(
 
         var teacherIdClaims =
             claims
-                .Where(x => x.Type == ClaimTypes.NameIdentifier)
-                .Select(x => x.Value)
+                .Where(static x => x.Type == ClaimTypes.NameIdentifier)
+                .Select(static x => x.Value)
                 .FirstOrDefault() ?? throw new UnauthorizedException("Invalid refresh token");
 
         var teacherId = Guid.Parse(teacherIdClaims);
@@ -339,7 +339,7 @@ public class AuthService(
             };
             var result = await this.teacherManager.CreateAsync(teacher, query.Password);
 
-            if (result.Succeeded is false)
+            if (!result.Succeeded)
             {
                 throw new InternalServerErrorException(result.Errors.First().Description);
             }
@@ -349,7 +349,7 @@ public class AuthService(
                 UserRoles.Teacher.ToString()
             );
 
-            if (result.Succeeded is false)
+            if (!result.Succeeded)
             {
                 throw new InternalServerErrorException(result.Errors.First().Description);
             }
@@ -395,7 +395,7 @@ public class AuthService(
             };
             var result = await this.userManager.CreateAsync(user, query.Password);
 
-            if (result.Succeeded is false)
+            if (!result.Succeeded)
             {
                 throw new InternalServerErrorException(result.Errors.First().Description);
             }
@@ -403,7 +403,7 @@ public class AuthService(
             await this.unitOfWork.SaveChangesAsync();
             result = await this.userManager.AddToRoleAsync(user, UserRoles.User.ToString());
 
-            if (result.Succeeded is false)
+            if (!result.Succeeded)
             {
                 throw new InternalServerErrorException(result.Errors.First().Description);
             }
@@ -446,7 +446,7 @@ public class AuthService(
         var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(query.Token));
         var result = await this.userManager.ConfirmEmailAsync(user, decodedToken);
 
-        if (result.Succeeded is false)
+        if (!result.Succeeded)
         {
             throw new UnauthorizedException(result.Errors.First().Description);
         }
@@ -464,7 +464,7 @@ public class AuthService(
 
         var result = await this.teacherManager.ConfirmEmailAsync(teacher, decodedToken);
 
-        if (result.Succeeded is false)
+        if (!result.Succeeded)
         {
             throw new UnauthorizedException(result.Errors.First().Description);
         }

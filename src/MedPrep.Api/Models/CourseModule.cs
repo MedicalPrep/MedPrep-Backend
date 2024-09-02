@@ -17,10 +17,10 @@ public class CourseModule : IBaseEntity, ISoftDeletable
     public Guid? Collection { get; set; }
     public Playlist? Playlist { get; set; }
     public Guid? PlaylistId { get; set; }
-    public ICollection<Video> Videos { get; } = new List<Video>();
+    public ICollection<Video> Videos { get; } = [];
     public Guid TeacherId { get; set; }
     public Teacher Teacher { get; set; } = null!;
-    public ICollection<User> Purchasers { get; } = new List<User>();
+    public ICollection<User> Purchasers { get; } = [];
 
     public DateTimeOffset CreatedAt { get; set; }
 

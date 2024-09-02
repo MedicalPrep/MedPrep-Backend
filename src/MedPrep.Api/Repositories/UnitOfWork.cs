@@ -35,7 +35,7 @@ public class UnitOfWork(MedPrepContext context) : IUnitOfWork, IDisposable
     {
         var entries = this
             .context.ChangeTracker.Entries<ISoftDeletable>()
-            .Where(e => e.State == EntityState.Deleted);
+            .Where(static e => e.State == EntityState.Deleted);
 
         foreach (var softDeletable in entries)
         {
@@ -49,8 +49,8 @@ public class UnitOfWork(MedPrepContext context) : IUnitOfWork, IDisposable
     {
         var entries = this
             .context.ChangeTracker.Entries<IBaseEntity>()
-            .Where(e => e.State is EntityState.Added or EntityState.Modified)
-            .Select(x => x);
+            .Where(static e => e.State is EntityState.Added or EntityState.Modified)
+            .Select(static x => x);
 
 
         foreach (var entityEntry in entries)

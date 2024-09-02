@@ -27,6 +27,7 @@ public class BunnyVideoService(
 
     public async Task<VideoUploadResult> UploadVideo(VideoUploadCommand command)
     {
+
         var teacher =
             await this.teacherRepository.GetbyIdAsync(command.TeacherId)
             ?? throw new InternalServerErrorException(
@@ -50,11 +51,13 @@ public class BunnyVideoService(
 
         try
         {
+            // Creating video on Bunny Stream
             var response = await this.bunnyHttpClient.CreateVideoAsync(
                 command.Title,
                 teacher.ThirdPartyVideoCollectionId
             );
 
+            // Storing Video information in Database
             var video = new Video() { Title = command.Title, Description = command.Description, };
             var videoSource = new VideoSource()
             {
@@ -65,6 +68,7 @@ public class BunnyVideoService(
             video.VideoSources.Add(videoSource);
             teacher.Videos.Add(video);
 
+            // Creating and Signing Token for user to upload to 3rd party Video Storage
             var presignedSignatureExpiration = DateTimeOffset
                 .UtcNow.AddDays(1)
                 .ToUnixTimeMilliseconds();

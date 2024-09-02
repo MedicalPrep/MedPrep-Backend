@@ -30,7 +30,7 @@ internal sealed class BadRequestExceptionHandler(ILogger<BadRequestExceptionHand
         {
             Status = StatusCodes.Status400BadRequest,
             Title = "Bad Request",
-            Detail = badRequestException.Message
+            Detail = badRequestException.Message,
         };
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;

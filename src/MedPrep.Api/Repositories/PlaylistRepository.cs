@@ -11,7 +11,7 @@ public class PlaylistRepository(MedPrepContext context) : IPlaylistRepository
     public Playlist? GetPlaylistByName(string name) =>
         this.context.Playlist.Where(p => p.Name == name).FirstOrDefault();
 
-    public IEnumerable<Playlist> GetAllPlaylists() => this.context.Playlist.ToList();
+    public IEnumerable<Playlist> GetAllPlaylists() => [.. this.context.Playlist];
 
     public void CreatePlaylist(Playlist playlist) => _ = this.context.Playlist.Add(playlist);
 

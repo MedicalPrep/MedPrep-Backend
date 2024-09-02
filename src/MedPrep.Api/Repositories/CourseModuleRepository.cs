@@ -9,7 +9,7 @@ public class CourseModuleRepository(MedPrepContext context) : ICourseModuleRepos
 {
     private readonly MedPrepContext context = context;
 
-    public IEnumerable<CourseModule> FindAll() => this.context.CourseModule.ToList();
+    public IEnumerable<CourseModule> FindAll() => [.. this.context.CourseModule];
 
     public async Task<CourseModule?> SaveAsync(CourseModule courseModule)
     {
