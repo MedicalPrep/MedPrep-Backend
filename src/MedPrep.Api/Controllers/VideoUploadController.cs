@@ -40,4 +40,45 @@ public class VideoUploadController(IVideoService videoService) : Controller
 
         return this.Ok(response);
     }
+
+    [HttpGet]
+    [Route("id")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<VideoRequestResponse>> GetVideoById([FromRoute] Guid id)
+    {
+        var video = await this.videoService.FetchVideoInfo(id);
+
+        if (video == null)
+        {
+            return this.NotFound();
+        }
+
+        // Map service response to VideoResponse DTO
+        var videoResponse = new VideoRequestResponse
+        {
+            Title = video.Title,
+            Description = video.Description,
+            NextVideo = video.NextVideo,
+            PrevVideo = video.PrevVideo,
+            VideoSource = video.VideoSource,
+            SubtitleSource = video.SubtitleSource,
+            CourseModule = video.CourseModule != null ? new CourseModuleDto
+            {
+                Id = video.CourseModule.Id,
+                Name = video.CourseModule.Name
+            } : null,
+            Playlist = video.Playlist != null ? new PlaylistDto
+            {
+                Id = video.Playlist.Id,
+                Name = video.Playlist.Name
+            } : null
+        };
+
+        return this.Ok(videoResponse);
+}
+
+
 }

@@ -15,12 +15,14 @@ using static MedPrep.Api.Services.Contracts.IVideoServiceContracts;
 
 public class BunnyVideoService(
     ITeacherRepository teacherRepository,
+    IVideoRepository videoRepository,
     IUnitOfWork unitOfWork,
     BunnyStreamHttpClient bunnyHttpClient,
     IOptions<BunnyStreamSettings> bunnySettings
 ) : IVideoService
 {
     private readonly ITeacherRepository teacherRepository = teacherRepository;
+    private readonly IVideoRepository videoRepository = videoRepository;
     private readonly BunnyStreamHttpClient bunnyHttpClient = bunnyHttpClient;
     private readonly IUnitOfWork unitOfWork = unitOfWork;
     private readonly BunnyStreamSettings bunnySettings = bunnySettings.Value;
@@ -104,5 +106,44 @@ public class BunnyVideoService(
             this.unitOfWork.RollbackTransaction();
             throw;
         }
+    }
+
+    public async Task<VideoRequestResponse> FetchVideoInfo(Guid videoId)
+    {
+        //fetch the video Id from the database (video respositiory)
+        var video = await this.videoRepository.GetByIdAsync(videoId) ?? throw new NotFoundException("Video Not Found");
+
+        var nextVideo = video.NextVideo;
+        var prevVideo = video.PrevVideo;
+        var courseModule = video.CourseModule;
+
+        // Fetch video play data from bunny stream
+        var playData = await this.bunnyHttpClient.GetVideoPlayDataAsync(video.ThirdPartyVideoId);
+
+        // Map to video response Data to Object
+        var videoResponse = new VideoRequestResponse
+        {
+            Title = video.Title,
+            Description = video.Description,
+            NextVideo = nextVideo?.Id,
+            PrevVideo = prevVideo?.Id,
+            VideoSource = playData.VideoSources.Select(vs => $"video-{vs.SourceId}-{vs.Quality}").ToList(),
+            SubtitleSource = playData.Subtitles.Select(sub => $"subtitle-{sub.SourceId}-{sub.Language}").ToList(),
+            CourseModule = courseModule != null ? new CourseModuleDto
+            {
+                Name = courseModule.Topic,
+                Id = courseModule.Id
+
+            } : null!,
+            Playlist = video.Playlist != null ? new PlaylistDto
+            {
+                Name = video.Playlist.Name,
+                Id = video.Playlist.Id
+            } : null!
+
+
+        };
+
+        return videoResponse;
     }
 }

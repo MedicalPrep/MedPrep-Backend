@@ -71,7 +71,10 @@ public class MedPrepContext(IOptions<PgDbConfig> options) : IdentityDbContext<Ac
 
         // _ = builder.Entity<Video>().HasIndex(video =>
         // video.IsDeleted).HasFilter("IsDeleted = 0");
-        _ = builder.Entity<Video>().HasQueryFilter(video => video.IsDeleted == false);
+        // _ = builder.Entity<Video>().HasQueryFilter(video => video.IsDeleted == false);
+        _ = builder.Entity<Video>().HasOne(v => v.NextVideo).WithOne().HasForeignKey<Video>(v => v.NextVideoId).OnDelete(DeleteBehavior.Restrict);
+
+        _ = builder.Entity<Video>().HasOne(v => v.PrevVideo).WithOne().HasForeignKey<Video>(v => v.PrevVideoId).OnDelete(DeleteBehavior.Restrict);
 
         // _ = builder
         //     .Entity<License>()
