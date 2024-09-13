@@ -15,6 +15,19 @@ public static class VideoUploadControllerContracts
         public string Title { get; set; } = string.Empty;
     };
 
+    // public record VideoPlayResponse
+    // {
+    //     public string Title { get; set; } = string.Empty;
+    //     public string Description { get; set; } = string.Empty;
+    //     public Guid? NextVideo { get; set; }
+    //     public Guid? PrevVideo { get; set; }
+    //     public string ThumbnailUrl { get; set; } = string.Empty;
+    //     public string VideoUrl { get; set; } = string.Empty;
+    //     public List<string> SubtitleSource { get; set; } = [];
+    //     public PlaylistDto? Playlist { get; set; }
+
+    // }
+
     // public record VideoRequestResponse
     // {
     //     public string Title { get; set; } = string.Empty;

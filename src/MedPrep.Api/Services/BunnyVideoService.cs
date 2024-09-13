@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using RestSharp;
 using MedPrep.Api.Config;
 using MedPrep.Api.Exceptions;
 using MedPrep.Api.HttpClients;
@@ -26,6 +27,8 @@ public class BunnyVideoService(
     private readonly BunnyStreamHttpClient bunnyHttpClient = bunnyHttpClient;
     private readonly IUnitOfWork unitOfWork = unitOfWork;
     private readonly BunnyStreamSettings bunnySettings = bunnySettings.Value;
+    private const string BunnyStreamApiKey = "YOUR_API_KEY";
+    private const string BunnyStreamBaseUrl = "https://video.bunnycdn.com";
 
     public async Task<VideoUploadResult> UploadVideo(VideoUploadCommand command)
     {
@@ -145,5 +148,32 @@ public class BunnyVideoService(
         };
 
         return videoResponse;
+    }
+    public async Task<VideoPlayResponse> PlayVideo(Guid videoId)
+    {
+        var client = new RestClient(BunnyStreamBaseUrl);
+
+        var request = new RestRequest($"library/{videoId}/play", Method.Get);
+
+        // Add necessary headers (API KEY)
+        request.AddHeader("accept", "application/json");
+        request.AddHeader("AccessKey", BunnyStreamApiKey);
+
+        var response = await client.GetAsync<VideoPlayResponse>(request) ?? throw new HttpRequestException("Failed to fetch the Video");
+
+        // Process the response and return the DTO
+        var videoPlayResponse = new VideoPlayResponse
+        {
+            Title = response.Title,
+            Description = response.Description,
+            NextVideo = response.NextVideo,
+            PrevVideo = response.PrevVideo,
+            ThumbnailUrl = response.ThumbnailUrl,
+            VideoUrl = response.VideoUrl,
+            SubtitleSource = response.SubtitleSource,
+            Playlist = response.Playlist
+        };
+
+        return videoPlayResponse;
     }
 }

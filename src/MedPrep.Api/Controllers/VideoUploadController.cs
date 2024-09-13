@@ -78,7 +78,57 @@ public class VideoUploadController(IVideoService videoService) : Controller
         };
 
         return this.Ok(videoResponse);
+    }
+
+    [HttpGet]
+    [Route("play/id")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<VideoPlayResponse>> PlayVideo(Guid videoId)
+    {
+        // i MADE REFERENCE TO THE SERVICE DTO FOR BOTH OF THE TWO FUNCTIONS, PLEASE CLARIFY,
+        //APPARENTLY ITS CONFLICTING FOR BOTH THE SERVICE AND THE CONTROLLER, I.E THE MODLE THE CONTROLLER IS MEANT TO RETURN, I COMMENTED IT OUT
+
+    try
+        {
+            // Fetch the video details from the BunnyStream service
+            var videoPlayResult = await this.videoService.PlayVideo(videoId);
+
+            if (videoPlayResult == null)
+            {
+                return this.NotFound(); // Return 404 if video not found
+            }
+
+            // Map the service result to your DTO
+            var videoPlayResponse = new VideoPlayResponse
+            {
+                Title = videoPlayResult.Title,
+                Description = videoPlayResult.Description,
+                VideoUrl = videoPlayResult.VideoUrl,
+                ThumbnailUrl = videoPlayResult.ThumbnailUrl,
+                NextVideo = videoPlayResult.NextVideo,
+                PrevVideo = videoPlayResult.PrevVideo,
+                SubtitleSource = videoPlayResult.SubtitleSource,
+                Playlist = videoPlayResult.Playlist
+            };
+
+            // Return the mapped DTO
+            return this.Ok(videoPlayResponse); // Return 200 OK with the DTO
+        }
+        catch (HttpRequestException ex)
+        {
+            // Handle error (e.g., BunnyStream API failure)
+            return this.StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            // Catch any other errors and return 500
+            return this.StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
 }
 
 
-}
+
