@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using RestSharp;
 using MedPrep.Api.Config;
 using MedPrep.Api.Exceptions;
 using MedPrep.Api.HttpClients;
@@ -15,15 +16,19 @@ using static MedPrep.Api.Services.Contracts.IVideoServiceContracts;
 
 public class BunnyVideoService(
     ITeacherRepository teacherRepository,
+    IVideoRepository videoRepository,
     IUnitOfWork unitOfWork,
     BunnyStreamHttpClient bunnyHttpClient,
     IOptions<BunnyStreamSettings> bunnySettings
 ) : IVideoService
 {
     private readonly ITeacherRepository teacherRepository = teacherRepository;
+    private readonly IVideoRepository videoRepository = videoRepository;
     private readonly BunnyStreamHttpClient bunnyHttpClient = bunnyHttpClient;
     private readonly IUnitOfWork unitOfWork = unitOfWork;
     private readonly BunnyStreamSettings bunnySettings = bunnySettings.Value;
+    private const string BunnyStreamApiKey = "YOUR_API_KEY";
+    private const string BunnyStreamBaseUrl = "https://video.bunnycdn.com";
 
     public async Task<VideoUploadResult> UploadVideo(VideoUploadCommand command)
     {
@@ -104,5 +109,71 @@ public class BunnyVideoService(
             this.unitOfWork.RollbackTransaction();
             throw;
         }
+    }
+
+    public async Task<VideoRequestResponse> FetchVideoInfo(Guid videoId)
+    {
+        //fetch the video Id from the database (video respositiory)
+        var video = await this.videoRepository.GetByIdAsync(videoId) ?? throw new NotFoundException("Video Not Found");
+
+        var nextVideo = video.NextVideo;
+        var prevVideo = video.PrevVideo;
+        var courseModule = video.CourseModule;
+
+        // Fetch video play data from bunny stream
+        var playData = await this.bunnyHttpClient.GetVideoPlayDataAsync(video.ThirdPartyVideoId);
+
+        // Map to video response Data to Object
+        var videoResponse = new VideoRequestResponse
+        {
+            Title = video.Title,
+            Description = video.Description,
+            NextVideo = nextVideo?.Id,
+            PrevVideo = prevVideo?.Id,
+            VideoSource = playData.VideoSources.Select(vs => $"video-{vs.SourceId}-{vs.Quality}").ToList(),
+            SubtitleSource = playData.Subtitles.Select(sub => $"subtitle-{sub.SourceId}-{sub.Language}").ToList(),
+            CourseModule = courseModule != null ? new CourseModuleDto
+            {
+                Name = courseModule.Topic,
+                Id = courseModule.Id
+
+            } : null!,
+            Playlist = video.Playlist != null ? new PlaylistDto
+            {
+                Name = video.Playlist.Name,
+                Id = video.Playlist.Id
+            } : null!
+
+
+        };
+
+        return videoResponse;
+    }
+    public async Task<VideoPlayResponse> PlayVideo(Guid videoId)
+    {
+        var client = new RestClient(BunnyStreamBaseUrl);
+
+        var request = new RestRequest($"library/{videoId}/play", Method.Get);
+
+        // Add necessary headers (API KEY)
+        request.AddHeader("accept", "application/json");
+        request.AddHeader("AccessKey", BunnyStreamApiKey);
+
+        var response = await client.GetAsync<VideoPlayResponse>(request) ?? throw new HttpRequestException("Failed to fetch the Video");
+
+        // Process the response and return the DTO
+        var videoPlayResponse = new VideoPlayResponse
+        {
+            Title = response.Title,
+            Description = response.Description,
+            NextVideo = response.NextVideo,
+            PrevVideo = response.PrevVideo,
+            ThumbnailUrl = response.ThumbnailUrl,
+            VideoUrl = response.VideoUrl,
+            SubtitleSource = response.SubtitleSource,
+            Playlist = response.Playlist
+        };
+
+        return videoPlayResponse;
     }
 }

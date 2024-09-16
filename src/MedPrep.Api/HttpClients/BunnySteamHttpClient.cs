@@ -55,6 +55,19 @@ public sealed class BunnyStreamHttpClient(
             );
         return result;
     }
+    public async Task<VideoPlayDataResponse> GetVideoPlayDataAsync(string videoId)
+    {
+        var path = $"/videos/{videoId}/play";
+        var response = await this.client.GetAsync(path);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InternalServerErrorException($"Failed to fetch video play data for video ID {videoId}");
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<VideoPlayDataResponse>()
+                    ?? throw new InternalServerErrorException($"Could not properly decode response from {ClientName}{path}");
+        return result;
+    }
 }
 
 public static class BunnyStreamHttpClientContracts
@@ -76,4 +89,32 @@ public static class BunnyStreamHttpClientContracts
         [JsonPropertyName("title")]
         public string? Title { get; set; }
     }
+    public record VideoPlayDataResponse
+    {
+        [JsonPropertyName("videoSources")]
+        public List<VideoSourceDto> VideoSources { get; set; } = new List<VideoSourceDto>();
+
+        [JsonPropertyName("subtitles")]
+        public List<SubtitleDto> Subtitles { get; set; } = new List<SubtitleDto>();
+    }
+    public record VideoSourceDto
+    {
+        [JsonPropertyName("sourceId")]
+        public string SourceId { get; set; } = string.Empty;
+
+        [JsonPropertyName("quality")]
+        public string Quality { get; set; } = string.Empty;
+    }
+
+    public record SubtitleDto
+    {
+        [JsonPropertyName("sourceId")]
+        public string SourceId { get; set; } = string.Empty;
+
+        [JsonPropertyName("language")]
+        public string Language { get; set; } = string.Empty;
+    }
+
+
 }
+
